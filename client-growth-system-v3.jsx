@@ -1,62 +1,67 @@
 import { useState, useRef, useEffect } from "react";
 
 // ─── DESIGN TOKENS ──────────────────────────────────────────────────────────
-const T = {
-  // Surfaces
-  bg: "#060608",
-  bgSub: "#0B0B0F",
-  surface: "#111116",
-  surfaceHover: "#16161D",
-  surface2: "#1A1A22",
-  elevated: "#1F1F29",
-  // Borders
-  border: "rgba(255,255,255,0.06)",
-  borderLight: "rgba(255,255,255,0.10)",
-  borderAccent: "rgba(99,102,241,0.25)",
-  // Text
-  text: "#EDEDEF",
-  textSecondary: "#8A8F98",
-  textMuted: "#55586A",
-  textDim: "#3D3F4E",
-  // Accents
-  accent: "#6366F1",     // Indigo
-  accentLight: "#818CF8",
-  accentDim: "rgba(99,102,241,0.12)",
-  accentGlow: "rgba(99,102,241,0.20)",
-  // Semantic
-  green: "#22C55E",
-  greenDim: "rgba(34,197,94,0.12)",
-  amber: "#F59E0B",
-  amberDim: "rgba(245,158,11,0.12)",
-  rose: "#F43F5E",
-  roseDim: "rgba(244,63,94,0.12)",
-  blue: "#3B82F6",
-  blueDim: "rgba(59,130,246,0.12)",
-  purple: "#A855F7",
-  purpleDim: "rgba(168,85,247,0.12)",
-  gold: "#EAB308",
-  goldDim: "rgba(234,179,8,0.12)",
-  cyan: "#06B6D4",
-  cyanDim: "rgba(6,182,212,0.12)",
-  // Spacing
-  radius: 12,
-  radiusSm: 8,
-  radiusLg: 16,
-  radiusXl: 20,
-  // Typography
+const SHARED = {
+  radius: 12, radiusSm: 8, radiusLg: 16, radiusXl: 20,
   fontBase: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   fontMono: "'Fira Code', 'JetBrains Mono', 'SF Mono', monospace",
+  // Semantic accent colors (same in both themes)
+  accent: "#6366F1", accentLight: "#818CF8",
+  accentDim: "rgba(99,102,241,0.12)", accentGlow: "rgba(99,102,241,0.20)",
+  green: "#22C55E", greenDim: "rgba(34,197,94,0.12)",
+  amber: "#F59E0B", amberDim: "rgba(245,158,11,0.12)",
+  rose: "#F43F5E", roseDim: "rgba(244,63,94,0.12)",
+  blue: "#3B82F6", blueDim: "rgba(59,130,246,0.12)",
+  purple: "#A855F7", purpleDim: "rgba(168,85,247,0.12)",
+  gold: "#EAB308", goldDim: "rgba(234,179,8,0.12)",
+  cyan: "#06B6D4", cyanDim: "rgba(6,182,212,0.12)",
 };
 
-// Client colors
-const CLIENT_COLORS = {
-  blue: { main: "#3B82F6", dim: "rgba(59,130,246,0.12)", glow: "rgba(59,130,246,0.20)" },
-  rose: { main: "#F43F5E", dim: "rgba(244,63,94,0.12)", glow: "rgba(244,63,94,0.20)" },
-  purple: { main: "#A855F7", dim: "rgba(168,85,247,0.12)", glow: "rgba(168,85,247,0.20)" },
-  green: { main: "#22C55E", dim: "rgba(34,197,94,0.12)", glow: "rgba(34,197,94,0.20)" },
-  amber: { main: "#F59E0B", dim: "rgba(245,158,11,0.12)", glow: "rgba(245,158,11,0.20)" },
-  gold: { main: "#EAB308", dim: "rgba(234,179,8,0.12)", glow: "rgba(234,179,8,0.20)" },
-  cyan: { main: "#06B6D4", dim: "rgba(6,182,212,0.12)", glow: "rgba(6,182,212,0.20)" },
+const THEMES = {
+  dark: {
+    ...SHARED,
+    bg: "#060608", bgSub: "#0B0B0F",
+    surface: "#111116", surfaceHover: "#16161D", surface2: "#1A1A22", elevated: "#1F1F29",
+    border: "rgba(255,255,255,0.06)", borderLight: "rgba(255,255,255,0.10)",
+    borderAccent: "rgba(99,102,241,0.25)",
+    text: "#EDEDEF", textSecondary: "#8A8F98", textMuted: "#55586A", textDim: "#3D3F4E",
+    headerBg: "#060608E6",
+    stepCircleText: "#fff",
+    glowOpacity: 0.5,
+  },
+  light: {
+    ...SHARED,
+    bg: "#F8F9FB", bgSub: "#FFFFFF",
+    surface: "#FFFFFF", surfaceHover: "#F1F3F8", surface2: "#EEF0F5", elevated: "#FFFFFF",
+    border: "rgba(0,0,0,0.08)", borderLight: "rgba(0,0,0,0.12)",
+    borderAccent: "rgba(99,102,241,0.20)",
+    text: "#1A1D27", textSecondary: "#5A6071", textMuted: "#8B90A0", textDim: "#B0B5C3",
+    headerBg: "#F8F9FBE6",
+    stepCircleText: "#fff",
+    glowOpacity: 0.25,
+  },
+};
+
+// Client colors — adjusted per theme for contrast
+const CLIENT_COLORS_MAP = {
+  dark: {
+    blue: { main: "#3B82F6", dim: "rgba(59,130,246,0.12)", glow: "rgba(59,130,246,0.20)" },
+    rose: { main: "#F43F5E", dim: "rgba(244,63,94,0.12)", glow: "rgba(244,63,94,0.20)" },
+    purple: { main: "#A855F7", dim: "rgba(168,85,247,0.12)", glow: "rgba(168,85,247,0.20)" },
+    green: { main: "#22C55E", dim: "rgba(34,197,94,0.12)", glow: "rgba(34,197,94,0.20)" },
+    amber: { main: "#F59E0B", dim: "rgba(245,158,11,0.12)", glow: "rgba(245,158,11,0.20)" },
+    gold: { main: "#EAB308", dim: "rgba(234,179,8,0.12)", glow: "rgba(234,179,8,0.20)" },
+    cyan: { main: "#06B6D4", dim: "rgba(6,182,212,0.12)", glow: "rgba(6,182,212,0.20)" },
+  },
+  light: {
+    blue: { main: "#2563EB", dim: "rgba(37,99,235,0.08)", glow: "rgba(37,99,235,0.12)" },
+    rose: { main: "#E11D48", dim: "rgba(225,29,72,0.08)", glow: "rgba(225,29,72,0.12)" },
+    purple: { main: "#9333EA", dim: "rgba(147,51,234,0.08)", glow: "rgba(147,51,234,0.12)" },
+    green: { main: "#16A34A", dim: "rgba(22,163,74,0.08)", glow: "rgba(22,163,74,0.12)" },
+    amber: { main: "#D97706", dim: "rgba(217,119,6,0.08)", glow: "rgba(217,119,6,0.12)" },
+    gold: { main: "#CA8A04", dim: "rgba(202,138,4,0.08)", glow: "rgba(202,138,4,0.12)" },
+    cyan: { main: "#0891B2", dim: "rgba(8,145,178,0.08)", glow: "rgba(8,145,178,0.12)" },
+  },
 };
 
 // ─── SVG ICONS (Lucide-style) ───────────────────────────────────────────────
@@ -115,7 +120,7 @@ function buildRoadmap(targetRevenue) {
   return [
     {
       phase: 1, name: "Fundament", icon: "layers",
-      timeline: "Maand 1-3", color: T.green, colorKey: "green",
+      timeline: "Maand 1-3", color: t.green, colorKey: "green",
       revenueTarget: Math.round(t * 0.35),
       tagline: "Digitale basis, eerste betalende klanten, systemen opzetten",
       status: "active",
@@ -152,7 +157,7 @@ function buildRoadmap(targetRevenue) {
     },
     {
       phase: 2, name: "Momentum", icon: "rocket",
-      timeline: "Maand 4-6", color: T.amber, colorKey: "amber",
+      timeline: "Maand 4-6", color: t.amber, colorKey: "amber",
       revenueTarget: Math.round(t * 0.70),
       tagline: "Ads opschalen, abonnement groeit, systemen draaien automatisch",
       status: "upcoming",
@@ -188,7 +193,7 @@ function buildRoadmap(targetRevenue) {
     },
     {
       phase: 3, name: "Dominantie", icon: "crown",
-      timeline: "Maand 7-9", color: T.rose, colorKey: "rose",
+      timeline: "Maand 7-9", color: t.rose, colorKey: "rose",
       revenueTarget: Math.round(t * 1.05),
       tagline: "Target bereikt, loyaliteitssysteem draait, lokale marktleider worden",
       status: "upcoming",
@@ -224,7 +229,7 @@ function buildRoadmap(targetRevenue) {
     },
     {
       phase: 4, name: "Schaalslag", icon: "zap",
-      timeline: "Maand 10-12", color: T.gold, colorKey: "gold",
+      timeline: "Maand 10-12", color: t.gold, colorKey: "gold",
       revenueTarget: Math.round(t * 1.40),
       tagline: "Peak season, team uitbreiden, jaar 2 plannen",
       status: "upcoming",
@@ -434,25 +439,27 @@ const TABS = [
 ];
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
-function getColor(key) {
-  return CLIENT_COLORS[key] || CLIENT_COLORS.blue;
+function getColor(key, theme) {
+  const map = CLIENT_COLORS_MAP[theme] || CLIENT_COLORS_MAP.dark;
+  return map[key] || map.blue;
 }
 
-function Badge({ children, color = T.accent, bg }) {
+function Badge({ children, color, bg, t }) {
+  const c = color || t.accent;
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, letterSpacing: "0.02em", color: color, background: bg || color + "18", padding: "3px 10px", borderRadius: 100 }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, letterSpacing: "0.02em", color: c, background: bg || c + "18", padding: "3px 10px", borderRadius: 100 }}>
       {children}
     </span>
   );
 }
 
-function SectionLabel({ children, style: s }) {
+function SectionLabel({ children, style: s, t }) {
   return (
-    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 16px", ...s }}>{children}</p>
+    <p style={{ color: t.textMuted, fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 16px", ...s }}>{children}</p>
   );
 }
 
-function Card({ children, style: s, hover, onClick }) {
+function Card({ children, style: s, hover, onClick, t }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -460,13 +467,13 @@ function Card({ children, style: s, hover, onClick }) {
       onMouseEnter={() => hover && setHovered(true)}
       onMouseLeave={() => hover && setHovered(false)}
       style={{
-        background: hovered ? T.surfaceHover : T.surface,
-        border: `1px solid ${T.border}`,
-        borderRadius: T.radius,
+        background: hovered ? t.surfaceHover : t.surface,
+        border: `1px solid ${t.border}`,
+        borderRadius: t.radius,
         padding: 20,
         transition: "all 0.2s ease",
         cursor: onClick ? "pointer" : "default",
-        ...(hovered ? { borderColor: T.borderLight, transform: "translateY(-1px)" } : {}),
+        ...(hovered ? { borderColor: t.borderLight, transform: "translateY(-1px)" } : {}),
         ...s,
       }}
     >
@@ -475,19 +482,19 @@ function Card({ children, style: s, hover, onClick }) {
   );
 }
 
-function Field({ label, value, onChange, multi, placeholder }) {
+function Field({ label, value, onChange, multi, placeholder, t }) {
   const [focused, setFocused] = useState(false);
   const base = {
-    width: "100%", background: T.bgSub, border: `1px solid ${focused ? T.accent + "66" : T.border}`,
-    borderRadius: T.radiusSm, padding: "10px 14px", color: T.text, fontSize: 14,
-    fontFamily: T.fontBase, outline: "none", boxSizing: "border-box",
+    width: "100%", background: t.bgSub, border: `1px solid ${focused ? t.accent + "66" : t.border}`,
+    borderRadius: t.radiusSm, padding: "10px 14px", color: t.text, fontSize: 14,
+    fontFamily: t.fontBase, outline: "none", boxSizing: "border-box",
     resize: multi ? "vertical" : "none", minHeight: multi ? 80 : undefined,
     transition: "border-color 0.2s ease",
     lineHeight: 1.5,
   };
   return (
     <div style={{ marginBottom: 16 }}>
-      <label style={{ display: "block", color: T.textSecondary, fontSize: 12, fontWeight: 500, marginBottom: 6, letterSpacing: "0.01em" }}>{label}</label>
+      <label style={{ display: "block", color: t.textSecondary, fontSize: 12, fontWeight: 500, marginBottom: 6, letterSpacing: "0.01em" }}>{label}</label>
       {multi
         ? <textarea style={base} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={3} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} />
         : <input style={base} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} />
@@ -496,11 +503,35 @@ function Field({ label, value, onChange, multi, placeholder }) {
   );
 }
 
-function ProgressBar({ value, color, height = 4 }) {
+function ProgressBar({ value, color, height = 4, t }) {
   return (
-    <div style={{ height, background: T.border, borderRadius: height, overflow: "hidden" }}>
-      <div style={{ height: "100%", width: `${Math.min(value, 100)}%`, background: color || T.accent, borderRadius: height, transition: "width 0.4s ease" }} />
+    <div style={{ height, background: t.border, borderRadius: height, overflow: "hidden" }}>
+      <div style={{ height: "100%", width: `${Math.min(value, 100)}%`, background: color || t.accent, borderRadius: height, transition: "width 0.4s ease" }} />
     </div>
+  );
+}
+
+function ThemeToggle({ theme, setTheme, t }) {
+  const isDark = theme === "dark";
+  return (
+    <button onClick={() => setTheme(isDark ? "light" : "dark")}
+      style={{
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+        width: "100%", background: t.surface2, border: `1px solid ${t.border}`,
+        borderRadius: t.radiusSm, padding: "8px", cursor: "pointer",
+        color: t.textSecondary, fontFamily: t.fontBase, fontSize: 12,
+        transition: "all 0.2s ease",
+      }}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        {isDark
+          ? <><circle cx="12" cy="12" r="5"/><line x1="12" x2="12" y1="1" y2="3"/><line x1="12" x2="12" y1="21" y2="23"/><line x1="4.22" x2="5.64" y1="4.22" y2="5.64"/><line x1="18.36" x2="19.78" y1="18.36" y2="19.78"/><line x1="1" x2="3" y1="12" y2="12"/><line x1="21" x2="23" y1="12" y2="12"/><line x1="4.22" x2="5.64" y1="19.78" y2="18.36"/><line x1="18.36" x2="19.78" y1="5.64" y2="4.22"/></>
+          : <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        }
+      </svg>
+      {isDark ? "Light mode" : "Dark mode"}
+    </button>
   );
 }
 
@@ -515,9 +546,11 @@ export default function ClientSystem() {
   const [channelView, setChannelView] = useState(false);
   const [copied, setCopied] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [theme, setTheme] = useState("dark");
 
+  const t = THEMES[theme];
   const client = clients.find(c => c.id === activeId) || clients[0];
-  const clientColor = getColor(client.colorKey);
+  const clientColor = getColor(client.colorKey, theme);
   const roadmap = buildRoadmap(client.targetRevenue);
 
   function updClient(key, val) {
@@ -575,50 +608,50 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
 
   // ─── RENDER ─────────────────────────────────────────────────────────────
   return (
-    <div style={{ fontFamily: T.fontBase, background: T.bg, minHeight: "100vh", color: T.text, display: "flex" }}>
+    <div style={{ fontFamily: t.fontBase, background: t.bg, minHeight: "100vh", color: t.text, display: "flex" }}>
 
       {/* ── SIDEBAR ── */}
       <aside style={{
         width: sidebarCollapsed ? 64 : 260, minWidth: sidebarCollapsed ? 64 : 260,
-        background: T.surface, borderRight: `1px solid ${T.border}`,
+        background: t.surface, borderRight: `1px solid ${t.border}`,
         display: "flex", flexDirection: "column", transition: "all 0.25s ease",
         height: "100vh", position: "sticky", top: 0, overflow: "hidden",
       }}>
         {/* Brand */}
-        <div style={{ padding: sidebarCollapsed ? "20px 12px" : "20px 20px", borderBottom: `1px solid ${T.border}`, display: "flex", alignItems: "center", gap: 12, minHeight: 64 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 10, background: `linear-gradient(135deg, ${T.accent}, ${T.accentLight})`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <div style={{ padding: sidebarCollapsed ? "20px 12px" : "20px 20px", borderBottom: `1px solid ${t.border}`, display: "flex", alignItems: "center", gap: 12, minHeight: 64 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 10, background: `linear-gradient(135deg, ${t.accent}, ${t.accentLight})`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <Icon name="zap" size={16} color="#fff" />
           </div>
           {!sidebarCollapsed && (
             <div style={{ overflow: "hidden" }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, margin: 0, whiteSpace: "nowrap" }}>Growth System</p>
-              <p style={{ color: T.textMuted, fontSize: 11, margin: 0, whiteSpace: "nowrap" }}>MT Marketing</p>
+              <p style={{ color: t.text, fontSize: 14, fontWeight: 700, margin: 0, whiteSpace: "nowrap" }}>Growth System</p>
+              <p style={{ color: t.textMuted, fontSize: 11, margin: 0, whiteSpace: "nowrap" }}>MT Marketing</p>
             </div>
           )}
         </div>
 
         {/* Client Switcher */}
-        <div style={{ padding: sidebarCollapsed ? "12px 8px" : "16px 12px", borderBottom: `1px solid ${T.border}` }}>
-          {!sidebarCollapsed && <SectionLabel style={{ margin: "0 0 10px", paddingLeft: 8 }}>Klanten</SectionLabel>}
+        <div style={{ padding: sidebarCollapsed ? "12px 8px" : "16px 12px", borderBottom: `1px solid ${t.border}` }}>
+          {!sidebarCollapsed && <SectionLabel t={t} style={{ margin: "0 0 10px", paddingLeft: 8 }}>Klanten</SectionLabel>}
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {clients.map(c => {
-              const cc = getColor(c.colorKey);
+              const cc = getColor(c.colorKey, theme);
               const isActive = activeId === c.id;
               return (
                 <button key={c.id} onClick={() => { setActiveId(c.id); setFwView(null); setActivePhase(null); }}
                   style={{
                     display: "flex", alignItems: "center", gap: 10,
                     background: isActive ? cc.dim : "transparent",
-                    border: "none", borderRadius: T.radiusSm,
+                    border: "none", borderRadius: t.radiusSm,
                     padding: sidebarCollapsed ? "8px" : "8px 12px",
-                    cursor: "pointer", color: isActive ? cc.main : T.textSecondary,
+                    cursor: "pointer", color: isActive ? cc.main : t.textSecondary,
                     fontSize: 13, fontWeight: isActive ? 600 : 400,
-                    fontFamily: T.fontBase, transition: "all 0.15s",
+                    fontFamily: t.fontBase, transition: "all 0.15s",
                     justifyContent: sidebarCollapsed ? "center" : "flex-start",
                     width: "100%", textAlign: "left",
                   }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, background: isActive ? cc.main + "22" : T.surface2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: `1px solid ${isActive ? cc.main + "44" : T.border}` }}>
-                    <Icon name={c.icon} size={14} color={isActive ? cc.main : T.textMuted} />
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: isActive ? cc.main + "22" : t.surface2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: `1px solid ${isActive ? cc.main + "44" : t.border}` }}>
+                    <Icon name={c.icon} size={14} color={isActive ? cc.main : t.textMuted} />
                   </div>
                   {!sidebarCollapsed && <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</span>}
                 </button>
@@ -627,10 +660,10 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
             <button onClick={addClient}
               style={{
                 display: "flex", alignItems: "center", gap: 10,
-                background: "transparent", border: `1px dashed ${T.border}`,
-                borderRadius: T.radiusSm, padding: sidebarCollapsed ? "8px" : "8px 12px",
-                cursor: "pointer", color: T.textMuted, fontSize: 13,
-                fontFamily: T.fontBase, justifyContent: sidebarCollapsed ? "center" : "flex-start",
+                background: "transparent", border: `1px dashed ${t.border}`,
+                borderRadius: t.radiusSm, padding: sidebarCollapsed ? "8px" : "8px 12px",
+                cursor: "pointer", color: t.textMuted, fontSize: 13,
+                fontFamily: t.fontBase, justifyContent: sidebarCollapsed ? "center" : "flex-start",
                 width: "100%", transition: "all 0.15s",
               }}>
               <Icon name="plus" size={14} />
@@ -641,36 +674,49 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
 
         {/* Navigation */}
         <nav style={{ padding: sidebarCollapsed ? "12px 8px" : "16px 12px", flex: 1 }}>
-          {!sidebarCollapsed && <SectionLabel style={{ margin: "0 0 10px", paddingLeft: 8 }}>Navigatie</SectionLabel>}
+          {!sidebarCollapsed && <SectionLabel t={t} style={{ margin: "0 0 10px", paddingLeft: 8 }}>Navigatie</SectionLabel>}
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {TABS.map(t => {
-              const isActive = tab === t.id;
+            {TABS.map(tb => {
+              const isActive = tab === tb.id;
               return (
-                <button key={t.id} onClick={() => { setTab(t.id); setFwView(null); setActivePhase(null); }}
+                <button key={tb.id} onClick={() => { setTab(tb.id); setFwView(null); setActivePhase(null); }}
                   style={{
                     display: "flex", alignItems: "center", gap: 10,
-                    background: isActive ? T.accentDim : "transparent",
-                    border: "none", borderRadius: T.radiusSm,
+                    background: isActive ? t.accentDim : "transparent",
+                    border: "none", borderRadius: t.radiusSm,
                     padding: sidebarCollapsed ? "10px" : "10px 12px",
                     cursor: "pointer",
-                    color: isActive ? T.accentLight : T.textSecondary,
+                    color: isActive ? t.accentLight : t.textSecondary,
                     fontSize: 13, fontWeight: isActive ? 600 : 400,
-                    fontFamily: T.fontBase, transition: "all 0.15s",
+                    fontFamily: t.fontBase, transition: "all 0.15s",
                     justifyContent: sidebarCollapsed ? "center" : "flex-start",
                     width: "100%", textAlign: "left",
                   }}>
-                  <Icon name={t.icon} size={16} color={isActive ? T.accentLight : T.textMuted} />
-                  {!sidebarCollapsed && <span>{t.label}</span>}
+                  <Icon name={tb.icon} size={16} color={isActive ? t.accentLight : t.textMuted} />
+                  {!sidebarCollapsed && <span>{tb.label}</span>}
                 </button>
               );
             })}
           </div>
         </nav>
 
-        {/* Collapse toggle */}
-        <div style={{ padding: 12, borderTop: `1px solid ${T.border}` }}>
+        {/* Theme toggle + Collapse */}
+        <div style={{ padding: 12, borderTop: `1px solid ${t.border}`, display: "flex", flexDirection: "column", gap: 6 }}>
+          {!sidebarCollapsed && <ThemeToggle theme={theme} setTheme={setTheme} t={t} />}
+          {sidebarCollapsed && (
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", background: t.surface2, border: `1px solid ${t.border}`, borderRadius: t.radiusSm, padding: "8px", cursor: "pointer", color: t.textSecondary, transition: "all 0.2s" }}
+              aria-label="Toggle theme">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {theme === "dark"
+                  ? <><circle cx="12" cy="12" r="5"/><line x1="12" x2="12" y1="1" y2="3"/><line x1="12" x2="12" y1="21" y2="23"/><line x1="4.22" x2="5.64" y1="4.22" y2="5.64"/><line x1="18.36" x2="19.78" y1="18.36" y2="19.78"/><line x1="1" x2="3" y1="12" y2="12"/><line x1="21" x2="23" y1="12" y2="12"/><line x1="4.22" x2="5.64" y1="19.78" y2="18.36"/><line x1="18.36" x2="19.78" y1="5.64" y2="4.22"/></>
+                  : <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                }
+              </svg>
+            </button>
+          )}
           <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", background: T.surface2, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "8px", cursor: "pointer", color: T.textMuted, fontFamily: T.fontBase, fontSize: 12, gap: 6, transition: "all 0.15s" }}>
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", background: t.surface2, border: `1px solid ${t.border}`, borderRadius: t.radiusSm, padding: "8px", cursor: "pointer", color: t.textMuted, fontFamily: t.fontBase, fontSize: 12, gap: 6, transition: "all 0.15s" }}>
             <Icon name={sidebarCollapsed ? "chevronRight" : "arrowLeft"} size={14} />
             {!sidebarCollapsed && <span>Minimaliseer</span>}
           </button>
@@ -683,8 +729,8 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
         {/* Top Bar */}
         <header style={{
           position: "sticky", top: 0, zIndex: 10,
-          background: T.bg + "E6", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
-          borderBottom: `1px solid ${T.border}`,
+          background: t.headerBg, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+          borderBottom: `1px solid ${t.border}`,
           padding: "0 32px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -693,16 +739,16 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
             </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <h1 style={{ color: T.text, fontSize: 16, fontWeight: 600, margin: 0 }}>{client.name}</h1>
-                <Badge color={clientColor.main}>{client.status}</Badge>
+                <h1 style={{ color: t.text, fontSize: 16, fontWeight: 600, margin: 0 }}>{client.name}</h1>
+                <Badge t={t} color={clientColor.main}>{client.status}</Badge>
               </div>
-              <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}>{client.type} &middot; {client.location} &middot; {client.modelName}</p>
+              <p style={{ color: t.textMuted, fontSize: 12, margin: 0 }}>{client.type} &middot; {client.location} &middot; {client.modelName}</p>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
             <div style={{ textAlign: "right" }}>
-              <p style={{ color: T.textMuted, fontSize: 11, margin: "0 0 2px", fontWeight: 500 }}>Maandelijks target</p>
-              <p style={{ color: clientColor.main, fontSize: 22, fontWeight: 700, margin: 0, fontFamily: T.fontMono, letterSpacing: "-0.02em" }}>
+              <p style={{ color: t.textMuted, fontSize: 11, margin: "0 0 2px", fontWeight: 500 }}>Maandelijks target</p>
+              <p style={{ color: clientColor.main, fontSize: 22, fontWeight: 700, margin: 0, fontFamily: t.fontMono, letterSpacing: "-0.02em" }}>
                 &euro;{parseInt(client.targetRevenue || 0).toLocaleString("nl-NL")}
               </p>
             </div>
@@ -715,21 +761,21 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
           {/* ══ PROFIEL ══ */}
           {tab === "profiel" && (
             <div>
-              <SectionLabel>Klant Informatie</SectionLabel>
-              <Card style={{ marginBottom: 20 }}>
+              <SectionLabel t={t}>Klant Informatie</SectionLabel>
+              <Card t={t} style={{ marginBottom: 20 }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px" }}>
-                  <Field label="Bedrijfsnaam" value={client.name} onChange={v => updClient("name", v)} />
-                  <Field label="Type Business" value={client.type} onChange={v => updClient("type", v)} />
-                  <Field label="Locatie" value={client.location} onChange={v => updClient("location", v)} />
-                  <Field label="Eigenaar" value={client.owner} onChange={v => updClient("owner", v)} />
-                  <Field label="Huidige Omzet (\u20AC/maand)" value={client.currentRevenue} onChange={v => updClient("currentRevenue", v)} />
-                  <Field label="Target Omzet (\u20AC/maand)" value={client.targetRevenue} onChange={v => updClient("targetRevenue", v)} />
+                  <Field t={t} label="Bedrijfsnaam" value={client.name} onChange={v => updClient("name", v)} />
+                  <Field t={t} label="Type Business" value={client.type} onChange={v => updClient("type", v)} />
+                  <Field t={t} label="Locatie" value={client.location} onChange={v => updClient("location", v)} />
+                  <Field t={t} label="Eigenaar" value={client.owner} onChange={v => updClient("owner", v)} />
+                  <Field t={t} label="Huidige Omzet (\u20AC/maand)" value={client.currentRevenue} onChange={v => updClient("currentRevenue", v)} />
+                  <Field t={t} label="Target Omzet (\u20AC/maand)" value={client.targetRevenue} onChange={v => updClient("targetRevenue", v)} />
                 </div>
-                <Field label="Producten & Diensten" value={client.products} onChange={v => updClient("products", v)} multi />
-                <Field label="Doelgroep" value={client.audience} onChange={v => updClient("audience", v)} multi />
-                <Field label="Framework Naam" value={client.modelName} onChange={v => updClient("modelName", v)} />
-                <Field label="Meest Gewenste Droomdoel (klantperspectief)" value={client.dreamGoal} onChange={v => updClient("dreamGoal", v)} multi />
-                <Field label="Notities" value={client.notes} onChange={v => updClient("notes", v)} multi />
+                <Field t={t} label="Producten & Diensten" value={client.products} onChange={v => updClient("products", v)} multi />
+                <Field t={t} label="Doelgroep" value={client.audience} onChange={v => updClient("audience", v)} multi />
+                <Field t={t} label="Framework Naam" value={client.modelName} onChange={v => updClient("modelName", v)} />
+                <Field t={t} label="Meest Gewenste Droomdoel (klantperspectief)" value={client.dreamGoal} onChange={v => updClient("dreamGoal", v)} multi />
+                <Field t={t} label="Notities" value={client.notes} onChange={v => updClient("notes", v)} multi />
               </Card>
             </div>
           )}
@@ -739,32 +785,32 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
             <div>
               {/* Dream Goal Hero */}
               <div style={{
-                background: `linear-gradient(135deg, ${clientColor.dim}, ${T.surface})`,
+                background: `linear-gradient(135deg, ${clientColor.dim}, ${t.surface})`,
                 border: `1px solid ${clientColor.main}33`,
-                borderRadius: T.radiusLg, padding: 28, marginBottom: 24,
+                borderRadius: t.radiusLg, padding: 28, marginBottom: 24,
                 position: "relative", overflow: "hidden",
               }}>
                 <div style={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", background: clientColor.glow, filter: "blur(60px)", opacity: 0.5 }} />
                 <div style={{ position: "relative" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                     <Icon name="star" size={14} color={clientColor.main} />
-                    <SectionLabel style={{ margin: 0 }}>Meest Gewenste Droomdoel</SectionLabel>
+                    <SectionLabel t={t} style={{ margin: 0 }}>Meest Gewenste Droomdoel</SectionLabel>
                   </div>
-                  <p style={{ color: T.text, fontSize: 18, fontStyle: "italic", margin: "0 0 16px", lineHeight: 1.6, fontWeight: 400 }}>"{client.dreamGoal}"</p>
+                  <p style={{ color: t.text, fontSize: 18, fontStyle: "italic", margin: "0 0 16px", lineHeight: 1.6, fontWeight: 400 }}>"{client.dreamGoal}"</p>
                   <textarea value={client.dreamGoal} onChange={e => updClient("dreamGoal", e.target.value)}
-                    style={{ width: "100%", background: "rgba(0,0,0,0.3)", border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "10px 14px", color: T.textSecondary, fontSize: 13, fontFamily: T.fontBase, resize: "none", boxSizing: "border-box", outline: "none", lineHeight: 1.5 }} rows={2} />
+                    style={{ width: "100%", background: "rgba(0,0,0,0.3)", border: `1px solid ${t.border}`, borderRadius: t.radiusSm, padding: "10px 14px", color: t.textSecondary, fontSize: 13, fontFamily: t.fontBase, resize: "none", boxSizing: "border-box", outline: "none", lineHeight: 1.5 }} rows={2} />
                 </div>
               </div>
 
               {/* Framework Cards */}
               {!fwView && (
                 <div>
-                  <SectionLabel>Core Results &mdash; {client.frameworks.length} Frameworks</SectionLabel>
+                  <SectionLabel t={t}>Core Results &mdash; {client.frameworks.length} Frameworks</SectionLabel>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     {client.frameworks.map(fw => {
-                      const fwColor = getColor(fw.colorKey);
+                      const fwColor = getColor(fw.colorKey, theme);
                       return (
-                        <Card key={fw.id} hover onClick={() => setFwView({ frameworkId: fw.id })}
+                        <Card t={t} key={fw.id} hover onClick={() => setFwView({ frameworkId: fw.id })}
                           style={{ borderLeft: `3px solid ${fwColor.main}` }}>
                           <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 14 }}>
                             <div style={{ width: 36, height: 36, borderRadius: 10, background: fwColor.dim, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -772,19 +818,19 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
                             </div>
                             <div>
                               <p style={{ color: fwColor.main, fontWeight: 600, fontSize: 14, margin: 0 }}>{fw.name}</p>
-                              <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}>{fw.subtitle}</p>
+                              <p style={{ color: t.textMuted, fontSize: 12, margin: 0 }}>{fw.subtitle}</p>
                             </div>
                           </div>
                           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 12 }}>
-                            {[{ l: "Free Value", items: fw.freeValue, c: T.green }, { l: "Low Ticket", items: fw.lowTicket, c: T.amber }].map(t => (
-                              <div key={t.l} style={{ background: t.c + "0D", borderRadius: 6, padding: "8px 10px" }}>
-                                <p style={{ color: t.c, fontSize: 10, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", margin: "0 0 4px" }}>{t.l}</p>
-                                <p style={{ color: T.textSecondary, fontSize: 11, margin: 0, lineHeight: 1.4 }}>{t.items?.[0] || "\u2014"}</p>
+                            {[{ l: "Free Value", items: fw.freeValue, c: t.green }, { l: "Low Ticket", items: fw.lowTicket, c: t.amber }].map(tier => (
+                              <div key={tier.l} style={{ background: tier.c + "0D", borderRadius: 6, padding: "8px 10px" }}>
+                                <p style={{ color: tier.c, fontSize: 10, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", margin: "0 0 4px" }}>{tier.l}</p>
+                                <p style={{ color: t.textSecondary, fontSize: 11, margin: 0, lineHeight: 1.4 }}>{tier.items?.[0] || "\u2014"}</p>
                               </div>
                             ))}
                           </div>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                            <p style={{ color: T.textMuted, fontSize: 11, margin: 0 }}>{fw.microFrameworks.length} micro-frameworks</p>
+                            <p style={{ color: t.textMuted, fontSize: 11, margin: 0 }}>{fw.microFrameworks.length} micro-frameworks</p>
                             <Icon name="chevronRight" size={14} color={fwColor.main} />
                           </div>
                         </Card>
@@ -796,51 +842,51 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
 
               {/* Framework Detail */}
               {fwView && !activeMf && activeFw && (() => {
-                const fwColor = getColor(activeFw.colorKey);
+                const fwColor = getColor(activeFw.colorKey, theme);
                 return (
                   <div>
-                    <button onClick={() => setFwView(null)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: T.accentLight, cursor: "pointer", fontSize: 13, marginBottom: 16, padding: 0, fontFamily: T.fontBase, fontWeight: 500 }}>
+                    <button onClick={() => setFwView(null)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: t.accentLight, cursor: "pointer", fontSize: 13, marginBottom: 16, padding: 0, fontFamily: t.fontBase, fontWeight: 500 }}>
                       <Icon name="arrowLeft" size={14} /> Terug naar overzicht
                     </button>
-                    <Card style={{ borderTop: `3px solid ${fwColor.main}`, marginBottom: 20, background: `linear-gradient(180deg, ${fwColor.dim}, ${T.surface})` }}>
+                    <Card t={t} style={{ borderTop: `3px solid ${fwColor.main}`, marginBottom: 20, background: `linear-gradient(180deg, ${fwColor.dim}, ${t.surface})` }}>
                       <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 16 }}>
                         <div style={{ width: 44, height: 44, borderRadius: 12, background: fwColor.dim, border: `1px solid ${fwColor.main}33`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                           <Icon name={activeFw.icon} size={22} color={fwColor.main} />
                         </div>
                         <div>
                           <h2 style={{ color: fwColor.main, fontSize: 20, margin: 0, fontWeight: 600 }}>{activeFw.name}</h2>
-                          <p style={{ color: T.textSecondary, fontSize: 13, margin: 0 }}>{activeFw.subtitle}</p>
+                          <p style={{ color: t.textSecondary, fontSize: 13, margin: 0 }}>{activeFw.subtitle}</p>
                         </div>
                       </div>
-                      <p style={{ color: T.textSecondary, fontSize: 13, lineHeight: 1.6, margin: "0 0 20px" }}>{activeFw.description}</p>
+                      <p style={{ color: t.textSecondary, fontSize: 13, lineHeight: 1.6, margin: "0 0 20px" }}>{activeFw.description}</p>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                         {[
-                          { l: "Free Value", items: activeFw.freeValue, c: T.green, ic: "gift" },
-                          { l: "Low Ticket", items: activeFw.lowTicket, c: T.amber, ic: "dollarSign" },
+                          { l: "Free Value", items: activeFw.freeValue, c: t.green, ic: "gift" },
+                          { l: "Low Ticket", items: activeFw.lowTicket, c: t.amber, ic: "dollarSign" },
                           { l: "Core Offer", items: activeFw.coreOffer, c: fwColor.main, ic: "briefcase" },
-                          { l: "High Ticket", items: activeFw.highTicket, c: T.gold, ic: "crown" },
-                        ].map(t => (
-                          <div key={t.l} style={{ background: T.bgSub, border: `1px solid ${t.c}22`, borderRadius: T.radiusSm, padding: "14px 16px" }}>
+                          { l: "High Ticket", items: activeFw.highTicket, c: t.gold, ic: "crown" },
+                        ].map(tier => (
+                          <div key={tier.l} style={{ background: t.bgSub, border: `1px solid ${tier.c}22`, borderRadius: t.radiusSm, padding: "14px 16px" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                              <Icon name={t.ic} size={12} color={t.c} />
-                              <p style={{ color: t.c, fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>{t.l}</p>
+                              <Icon name={tier.ic} size={12} color={tier.c} />
+                              <p style={{ color: tier.c, fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>{tier.l}</p>
                             </div>
-                            {t.items?.map((item, k) => <p key={k} style={{ color: T.text, fontSize: 12, margin: "0 0 4px", lineHeight: 1.5 }}>&bull; {item}</p>)}
+                            {tier.items?.map((item, k) => <p key={k} style={{ color: t.text, fontSize: 12, margin: "0 0 4px", lineHeight: 1.5 }}>&bull; {item}</p>)}
                           </div>
                         ))}
                       </div>
                     </Card>
-                    <SectionLabel>Micro-Frameworks</SectionLabel>
+                    <SectionLabel t={t}>Micro-Frameworks</SectionLabel>
                     {activeFw.microFrameworks.map((mf, idx) => (
-                      <Card key={idx} hover onClick={() => setFwView({ frameworkId: activeFw.id, microIndex: idx })} style={{ marginBottom: 8, padding: "14px 18px" }}>
+                      <Card t={t} key={idx} hover onClick={() => setFwView({ frameworkId: activeFw.id, microIndex: idx })} style={{ marginBottom: 8, padding: "14px 18px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                             <div style={{ width: 32, height: 32, borderRadius: 8, background: fwColor.dim, display: "flex", alignItems: "center", justifyContent: "center" }}>
                               <Icon name={mf.icon} size={16} color={fwColor.main} />
                             </div>
                             <div>
-                              <p style={{ color: T.text, fontSize: 14, fontWeight: 600, margin: 0 }}>{mf.name}</p>
-                              <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}>{mf.steps.length} stappen</p>
+                              <p style={{ color: t.text, fontSize: 14, fontWeight: 600, margin: 0 }}>{mf.name}</p>
+                              <p style={{ color: t.textMuted, fontSize: 12, margin: 0 }}>{mf.steps.length} stappen</p>
                             </div>
                           </div>
                           <Icon name="chevronRight" size={16} color={fwColor.main} />
@@ -853,28 +899,28 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
 
               {/* Micro-Framework Detail */}
               {fwView && activeMf && activeFw && (() => {
-                const fwColor = getColor(activeFw.colorKey);
+                const fwColor = getColor(activeFw.colorKey, theme);
                 return (
                   <div>
-                    <button onClick={() => setFwView({ frameworkId: activeFw.id })} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: T.accentLight, cursor: "pointer", fontSize: 13, marginBottom: 16, padding: 0, fontFamily: T.fontBase, fontWeight: 500 }}>
+                    <button onClick={() => setFwView({ frameworkId: activeFw.id })} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: t.accentLight, cursor: "pointer", fontSize: 13, marginBottom: 16, padding: 0, fontFamily: t.fontBase, fontWeight: 500 }}>
                       <Icon name="arrowLeft" size={14} /> Terug naar {activeFw.name}
                     </button>
-                    <Card style={{ background: `linear-gradient(180deg, ${fwColor.dim}, ${T.surface})`, borderTop: `3px solid ${fwColor.main}` }}>
+                    <Card t={t} style={{ background: `linear-gradient(180deg, ${fwColor.dim}, ${t.surface})`, borderTop: `3px solid ${fwColor.main}` }}>
                       <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 24 }}>
                         <div style={{ width: 44, height: 44, borderRadius: 12, background: fwColor.dim, border: `1px solid ${fwColor.main}33`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                           <Icon name={activeMf.icon} size={22} color={fwColor.main} />
                         </div>
                         <div>
-                          <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>{activeFw.name} &middot; Micro-Framework</p>
+                          <p style={{ color: t.textMuted, fontSize: 11, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>{activeFw.name} &middot; Micro-Framework</p>
                           <h2 style={{ color: fwColor.main, fontSize: 20, margin: "4px 0 0", fontWeight: 600 }}>{activeMf.name}</h2>
                         </div>
                       </div>
                       {activeMf.steps.map((step, i) => (
-                        <div key={i} style={{ display: "flex", gap: 14, padding: "14px 0", borderBottom: i < activeMf.steps.length - 1 ? `1px solid ${T.border}` : "none" }}>
+                        <div key={i} style={{ display: "flex", gap: 14, padding: "14px 0", borderBottom: i < activeMf.steps.length - 1 ? `1px solid ${t.border}` : "none" }}>
                           <div style={{ width: 28, height: 28, borderRadius: "50%", background: fwColor.main, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                             <span style={{ color: "#fff", fontSize: 12, fontWeight: 700 }}>{i + 1}</span>
                           </div>
-                          <p style={{ color: T.text, fontSize: 14, lineHeight: 1.6, margin: 0, paddingTop: 3 }}>{step}</p>
+                          <p style={{ color: t.text, fontSize: 14, lineHeight: 1.6, margin: 0, paddingTop: 3 }}>{step}</p>
                         </div>
                       ))}
                     </Card>
@@ -887,26 +933,26 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
           {/* ══ VALUE MATRIX ══ */}
           {tab === "matrix" && (
             <div>
-              <SectionLabel>Value Matrix &mdash; {client.modelName}</SectionLabel>
-              <Card style={{ padding: 0, overflow: "hidden" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr 1fr 1fr", background: T.surface2, padding: "12px 18px", gap: 12, borderBottom: `1px solid ${T.border}` }}>
+              <SectionLabel t={t}>Value Matrix &mdash; {client.modelName}</SectionLabel>
+              <Card t={t} style={{ padding: 0, overflow: "hidden" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr 1fr 1fr", background: t.surface2, padding: "12px 18px", gap: 12, borderBottom: `1px solid ${t.border}` }}>
                   {["Core Result", "Free Value", "Low Ticket", "Core Offer", "High Ticket"].map((h, i) => (
-                    <p key={i} style={{ color: i === 0 ? T.textSecondary : [T.green, T.amber, T.accent, T.gold][i - 1], fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>{h}</p>
+                    <p key={i} style={{ color: i === 0 ? t.textSecondary : [t.green, t.amber, t.accent, t.gold][i - 1], fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>{h}</p>
                   ))}
                 </div>
                 {client.frameworks.map((fw, i) => {
-                  const fwColor = getColor(fw.colorKey);
+                  const fwColor = getColor(fw.colorKey, theme);
                   return (
-                    <div key={fw.id} style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr 1fr 1fr", padding: "14px 18px", gap: 12, borderBottom: i < client.frameworks.length - 1 ? `1px solid ${T.border}` : "none", background: i % 2 === 0 ? T.bg : T.surface, alignItems: "start" }}>
+                    <div key={fw.id} style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr 1fr 1fr", padding: "14px 18px", gap: 12, borderBottom: i < client.frameworks.length - 1 ? `1px solid ${t.border}` : "none", background: i % 2 === 0 ? t.bg : t.surface, alignItems: "start" }}>
                       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                         <Icon name={fw.icon} size={14} color={fwColor.main} />
                         <div>
                           <p style={{ color: fwColor.main, fontWeight: 600, fontSize: 13, margin: "0 0 2px" }}>{fw.name}</p>
-                          <p style={{ color: T.textMuted, fontSize: 11, margin: 0 }}>{fw.subtitle}</p>
+                          <p style={{ color: t.textMuted, fontSize: 11, margin: 0 }}>{fw.subtitle}</p>
                         </div>
                       </div>
                       {[fw.freeValue, fw.lowTicket, fw.coreOffer, fw.highTicket].map((items, j) => (
-                        <div key={j}>{(items || []).map((item, k) => <p key={k} style={{ color: T.textSecondary, fontSize: 12, margin: "0 0 4px", lineHeight: 1.5 }}>&bull; {item}</p>)}</div>
+                        <div key={j}>{(items || []).map((item, k) => <p key={k} style={{ color: t.textSecondary, fontSize: 12, margin: "0 0 4px", lineHeight: 1.5 }}>&bull; {item}</p>)}</div>
                       ))}
                     </div>
                   );
@@ -925,9 +971,9 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
                   return (
                     <div key={ph.phase} onClick={() => { setActivePhase(isActive ? null : i); setActiveWeek(null); setChannelView(false); }}
                       style={{
-                        background: isActive ? ph.color + "14" : T.surface,
-                        border: `1px solid ${isActive ? ph.color + "55" : T.border}`,
-                        borderRadius: T.radius, padding: "18px", cursor: "pointer",
+                        background: isActive ? ph.color + "14" : t.surface,
+                        border: `1px solid ${isActive ? ph.color + "55" : t.border}`,
+                        borderRadius: t.radius, padding: "18px", cursor: "pointer",
                         transition: "all 0.2s ease",
                         position: "relative", overflow: "hidden",
                       }}>
@@ -935,12 +981,12 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
                       <div style={{ position: "relative" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
                           <Icon name={ph.icon} size={20} color={ph.color} />
-                          <Badge color={ph.color} bg={ph.color + "1A"}>Fase {ph.phase}</Badge>
+                          <Badge t={t} color={ph.color} bg={ph.color + "1A"}>Fase {ph.phase}</Badge>
                         </div>
                         <p style={{ color: ph.color, fontWeight: 700, fontSize: 16, margin: "0 0 3px" }}>{ph.name}</p>
-                        <p style={{ color: T.textMuted, fontSize: 12, margin: "0 0 12px" }}>{ph.timeline}</p>
-                        <p style={{ color: T.text, fontSize: 18, fontWeight: 700, margin: "0 0 8px", fontFamily: T.fontMono }}>&euro;{ph.revenueTarget.toLocaleString("nl-NL")}<span style={{ color: T.textMuted, fontSize: 11, fontWeight: 400 }}>/mo</span></p>
-                        <ProgressBar value={[35, 70, 100, 100][i]} color={ph.color} />
+                        <p style={{ color: t.textMuted, fontSize: 12, margin: "0 0 12px" }}>{ph.timeline}</p>
+                        <p style={{ color: t.text, fontSize: 18, fontWeight: 700, margin: "0 0 8px", fontFamily: t.fontMono }}>&euro;{ph.revenueTarget.toLocaleString("nl-NL")}<span style={{ color: t.textMuted, fontSize: 11, fontWeight: 400 }}>/mo</span></p>
+                        <ProgressBar t={t} value={[35, 70, 100, 100][i]} color={ph.color} />
                       </div>
                     </div>
                   );
@@ -951,26 +997,26 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
               {activePhase !== null && phaseObj && (
                 <div>
                   {/* Phase Header */}
-                  <Card style={{ background: `linear-gradient(135deg, ${phaseObj.color}0D, ${T.surface})`, borderTop: `3px solid ${phaseObj.color}`, marginBottom: 20 }}>
+                  <Card t={t} style={{ background: `linear-gradient(135deg, ${phaseObj.color}0D, ${t.surface})`, borderTop: `3px solid ${phaseObj.color}`, marginBottom: 20 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                       <div>
                         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                          <Badge color={phaseObj.color} bg={phaseObj.color + "1A"}>Fase {phaseObj.phase}</Badge>
-                          <span style={{ color: T.textMuted, fontSize: 12 }}>{phaseObj.timeline}</span>
+                          <Badge t={t} color={phaseObj.color} bg={phaseObj.color + "1A"}>Fase {phaseObj.phase}</Badge>
+                          <span style={{ color: t.textMuted, fontSize: 12 }}>{phaseObj.timeline}</span>
                         </div>
-                        <h2 style={{ color: T.text, fontSize: 22, margin: "0 0 6px", fontWeight: 600 }}>{phaseObj.name}</h2>
-                        <p style={{ color: T.textSecondary, fontSize: 14, margin: 0 }}>{phaseObj.tagline}</p>
+                        <h2 style={{ color: t.text, fontSize: 22, margin: "0 0 6px", fontWeight: 600 }}>{phaseObj.name}</h2>
+                        <p style={{ color: t.textSecondary, fontSize: 14, margin: 0 }}>{phaseObj.tagline}</p>
                       </div>
                       <div style={{ textAlign: "right", flexShrink: 0 }}>
-                        <p style={{ color: T.textMuted, fontSize: 11, margin: "0 0 4px", fontWeight: 500 }}>Omzet target</p>
-                        <p style={{ color: phaseObj.color, fontWeight: 700, fontSize: 26, margin: 0, fontFamily: T.fontMono }}>&euro;{phaseObj.revenueTarget.toLocaleString("nl-NL")}</p>
+                        <p style={{ color: t.textMuted, fontSize: 11, margin: "0 0 4px", fontWeight: 500 }}>Omzet target</p>
+                        <p style={{ color: phaseObj.color, fontWeight: 700, fontSize: 26, margin: 0, fontFamily: t.fontMono }}>&euro;{phaseObj.revenueTarget.toLocaleString("nl-NL")}</p>
                       </div>
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                       {phaseObj.goals.map((g, i) => (
                         <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
                           <Icon name="check" size={14} color={phaseObj.color} style={{ marginTop: 2 }} />
-                          <p style={{ color: T.text, fontSize: 13, margin: 0, lineHeight: 1.5 }}>{g}</p>
+                          <p style={{ color: t.text, fontSize: 13, margin: 0, lineHeight: 1.5 }}>{g}</p>
                         </div>
                       ))}
                     </div>
@@ -982,11 +1028,11 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
                       <button key={sub.id} onClick={() => { setChannelView(sub.id); setActiveWeek(null); }}
                         style={{
                           display: "flex", alignItems: "center", gap: 6,
-                          background: channelView === sub.id ? phaseObj.color + "18" : T.surface,
-                          border: `1px solid ${channelView === sub.id ? phaseObj.color + "44" : T.border}`,
+                          background: channelView === sub.id ? phaseObj.color + "18" : t.surface,
+                          border: `1px solid ${channelView === sub.id ? phaseObj.color + "44" : t.border}`,
                           borderRadius: 100, padding: "8px 16px", cursor: "pointer",
-                          color: channelView === sub.id ? phaseObj.color : T.textSecondary,
-                          fontSize: 13, fontWeight: 500, fontFamily: T.fontBase, transition: "all 0.15s",
+                          color: channelView === sub.id ? phaseObj.color : t.textSecondary,
+                          fontSize: 13, fontWeight: 500, fontFamily: t.fontBase, transition: "all 0.15s",
                         }}>
                         <Icon name={sub.icon} size={14} />
                         {sub.label}
@@ -999,24 +1045,24 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       {phaseObj.weeks.map((w, wi) => (
                         <div key={wi}>
-                          <Card hover onClick={() => setActiveWeek(activeWeek === wi ? null : wi)}
-                            style={{ padding: "14px 18px", borderRadius: activeWeek === wi ? `${T.radius}px ${T.radius}px 0 0` : T.radius }}>
+                          <Card t={t} hover onClick={() => setActiveWeek(activeWeek === wi ? null : wi)}
+                            style={{ padding: "14px 18px", borderRadius: activeWeek === wi ? `${t.radius}px ${t.radius}px 0 0` : t.radius }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                               <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                                <Badge color={phaseObj.color} bg={phaseObj.color + "1A"}>{w.label}</Badge>
-                                <p style={{ color: T.text, fontSize: 14, fontWeight: 500, margin: 0 }}>{w.title}</p>
+                                <Badge t={t} color={phaseObj.color} bg={phaseObj.color + "1A"}>{w.label}</Badge>
+                                <p style={{ color: t.text, fontSize: 14, fontWeight: 500, margin: 0 }}>{w.title}</p>
                               </div>
                               <Icon name={activeWeek === wi ? "chevronUp" : "chevronDown"} size={16} color={phaseObj.color} />
                             </div>
                           </Card>
                           {activeWeek === wi && (
-                            <div style={{ background: phaseObj.color + "08", border: `1px solid ${phaseObj.color}22`, borderTop: "none", borderRadius: `0 0 ${T.radius}px ${T.radius}px`, padding: "18px 20px" }}>
+                            <div style={{ background: phaseObj.color + "08", border: `1px solid ${phaseObj.color}22`, borderTop: "none", borderRadius: `0 0 ${t.radius}px ${t.radius}px`, padding: "18px 20px" }}>
                               {w.tasks.map((task, ti) => (
                                 <div key={ti} style={{ display: "flex", gap: 12, marginBottom: ti < w.tasks.length - 1 ? 12 : 0 }}>
                                   <div style={{ width: 24, height: 24, borderRadius: "50%", background: phaseObj.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
                                     <span style={{ color: "#fff", fontSize: 11, fontWeight: 700 }}>{ti + 1}</span>
                                   </div>
-                                  <p style={{ color: T.text, fontSize: 13, margin: 0, lineHeight: 1.6, paddingTop: 2 }}>{task}</p>
+                                  <p style={{ color: t.text, fontSize: 13, margin: 0, lineHeight: 1.6, paddingTop: 2 }}>{task}</p>
                                 </div>
                               ))}
                             </div>
@@ -1030,24 +1076,24 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
                   {channelView === "channels" && (
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                       {phaseObj.channels.map((ch, i) => (
-                        <Card key={i} style={{ padding: "16px 18px", opacity: ch.active ? 1 : 0.45 }}>
+                        <Card t={t} key={i} style={{ padding: "16px 18px", opacity: ch.active ? 1 : 0.45 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                              <div style={{ width: 30, height: 30, borderRadius: 8, background: ch.active ? phaseObj.color + "15" : T.surface2, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                <Icon name={ch.icon} size={14} color={ch.active ? phaseObj.color : T.textMuted} />
+                              <div style={{ width: 30, height: 30, borderRadius: 8, background: ch.active ? phaseObj.color + "15" : t.surface2, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <Icon name={ch.icon} size={14} color={ch.active ? phaseObj.color : t.textMuted} />
                               </div>
-                              <p style={{ color: ch.active ? T.text : T.textMuted, fontSize: 13, fontWeight: 600, margin: 0 }}>{ch.name}</p>
+                              <p style={{ color: ch.active ? t.text : t.textMuted, fontSize: 13, fontWeight: 600, margin: 0 }}>{ch.name}</p>
                             </div>
-                            <Badge color={ch.active ? T.green : T.textMuted} bg={ch.active ? T.greenDim : T.surface2}>
+                            <Badge t={t} color={ch.active ? t.green : t.textMuted} bg={ch.active ? t.greenDim : t.surface2}>
                               {ch.active ? "Actief" : "Inactief"}
                             </Badge>
                           </div>
-                          <p style={{ color: T.textMuted, fontSize: 12, margin: "0 0 10px", lineHeight: 1.5 }}>{ch.note}</p>
+                          <p style={{ color: t.textMuted, fontSize: 12, margin: "0 0 10px", lineHeight: 1.5 }}>{ch.note}</p>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                            <span style={{ color: T.amber, fontSize: 12, fontWeight: 600, fontFamily: T.fontMono }}>{ch.budget}</span>
-                            <span style={{ color: T.textMuted, fontSize: 11 }}>{ch.intensity}%</span>
+                            <span style={{ color: t.amber, fontSize: 12, fontWeight: 600, fontFamily: t.fontMono }}>{ch.budget}</span>
+                            <span style={{ color: t.textMuted, fontSize: 11 }}>{ch.intensity}%</span>
                           </div>
-                          <ProgressBar value={ch.intensity} color={phaseObj.color} />
+                          <ProgressBar t={t} value={ch.intensity} color={phaseObj.color} />
                         </Card>
                       ))}
                     </div>
@@ -1057,14 +1103,14 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
                   {channelView === "kpis" && (
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                       {phaseObj.kpis.map((kpi, i) => (
-                        <Card key={i} style={{ padding: "18px 20px" }}>
+                        <Card t={t} key={i} style={{ padding: "18px 20px" }}>
                           <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
                             <div style={{ width: 44, height: 44, borderRadius: 12, background: phaseObj.color + "15", border: `1px solid ${phaseObj.color}22`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                               <Icon name={kpi.icon} size={20} color={phaseObj.color} />
                             </div>
                             <div>
-                              <p style={{ color: T.textMuted, fontSize: 12, margin: "0 0 4px" }}>{kpi.label}</p>
-                              <p style={{ color: phaseObj.color, fontSize: 20, fontWeight: 700, margin: 0, fontFamily: T.fontMono }}>{kpi.target}</p>
+                              <p style={{ color: t.textMuted, fontSize: 12, margin: "0 0 4px" }}>{kpi.label}</p>
+                              <p style={{ color: phaseObj.color, fontSize: 20, fontWeight: 700, margin: 0, fontFamily: t.fontMono }}>{kpi.target}</p>
                             </div>
                           </div>
                         </Card>
@@ -1074,8 +1120,8 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
 
                   {!channelView && (
                     <div style={{ textAlign: "center", padding: 40 }}>
-                      <Icon name="layout" size={32} color={T.textDim} style={{ marginBottom: 12, display: "inline-block" }} />
-                      <p style={{ color: T.textMuted, fontSize: 14, margin: 0 }}>Kies een weergave: Weekplan, Marketing Kanalen of KPI's</p>
+                      <Icon name="layout" size={32} color={t.textDim} style={{ marginBottom: 12, display: "inline-block" }} />
+                      <p style={{ color: t.textMuted, fontSize: 14, margin: 0 }}>Kies een weergave: Weekplan, Marketing Kanalen of KPI's</p>
                     </div>
                   )}
                 </div>
@@ -1084,36 +1130,36 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
               {/* Marketing Channel Overview */}
               {activePhase === null && (
                 <div>
-                  <SectionLabel>Marketing Kanalen Overzicht</SectionLabel>
-                  <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16, lineHeight: 1.5 }}>Klik op een fase hierboven voor het gedetailleerde weekplan en KPI's.</p>
-                  <Card style={{ padding: 0, overflow: "hidden" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 80px 80px 80px", background: T.surface2, padding: "12px 18px", gap: 10, borderBottom: `1px solid ${T.border}` }}>
-                      <p style={{ color: T.textSecondary, fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Kanaal</p>
+                  <SectionLabel t={t}>Marketing Kanalen Overzicht</SectionLabel>
+                  <p style={{ color: t.textMuted, fontSize: 13, marginBottom: 16, lineHeight: 1.5 }}>Klik op een fase hierboven voor het gedetailleerde weekplan en KPI's.</p>
+                  <Card t={t} style={{ padding: 0, overflow: "hidden" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 80px 80px 80px", background: t.surface2, padding: "12px 18px", gap: 10, borderBottom: `1px solid ${t.border}` }}>
+                      <p style={{ color: t.textSecondary, fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Kanaal</p>
                       {roadmap.map(ph => <p key={ph.phase} style={{ color: ph.color, fontSize: 10, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", margin: 0, textAlign: "center" }}>F{ph.phase}</p>)}
                     </div>
                     {MARKETING_CHANNELS.map((ch, i) => (
-                      <div key={ch.id} style={{ display: "grid", gridTemplateColumns: "1fr 80px 80px 80px 80px", padding: "12px 18px", gap: 10, borderBottom: i < MARKETING_CHANNELS.length - 1 ? `1px solid ${T.border}` : "none", background: i % 2 === 0 ? T.bg : T.surface, alignItems: "center" }}>
+                      <div key={ch.id} style={{ display: "grid", gridTemplateColumns: "1fr 80px 80px 80px 80px", padding: "12px 18px", gap: 10, borderBottom: i < MARKETING_CHANNELS.length - 1 ? `1px solid ${t.border}` : "none", background: i % 2 === 0 ? t.bg : t.surface, alignItems: "center" }}>
                         <div>
                           <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 3 }}>
-                            <Icon name={ch.icon} size={14} color={T.textSecondary} />
-                            <p style={{ color: T.text, fontSize: 13, fontWeight: 600, margin: 0 }}>{ch.name}</p>
-                            <Badge color={ch.type === "Betaald" ? T.rose : ch.type === "Retentie" ? T.purple : T.green}>
+                            <Icon name={ch.icon} size={14} color={t.textSecondary} />
+                            <p style={{ color: t.text, fontSize: 13, fontWeight: 600, margin: 0 }}>{ch.name}</p>
+                            <Badge t={t} color={ch.type === "Betaald" ? t.rose : ch.type === "Retentie" ? t.purple : t.green}>
                               {ch.type}
                             </Badge>
                           </div>
-                          <p style={{ color: T.textMuted, fontSize: 11, margin: "0 0 0 22px", lineHeight: 1.4 }}>{ch.desc}</p>
+                          <p style={{ color: t.textMuted, fontSize: 11, margin: "0 0 0 22px", lineHeight: 1.4 }}>{ch.desc}</p>
                         </div>
                         {[1,2,3,4].map(ph => (
                           <div key={ph} style={{ textAlign: "center" }}>
                             {ch.phases.includes(ph)
                               ? <div style={{ width: 10, height: 10, borderRadius: "50%", background: roadmap[ph-1].color, margin: "0 auto", boxShadow: `0 0 8px ${roadmap[ph-1].color}44` }} />
-                              : <div style={{ width: 10, height: 10, borderRadius: "50%", background: T.border, margin: "0 auto" }} />}
+                              : <div style={{ width: 10, height: 10, borderRadius: "50%", background: t.border, margin: "0 auto" }} />}
                           </div>
                         ))}
                       </div>
                     ))}
                   </Card>
-                  <p style={{ color: T.textDim, fontSize: 11, marginTop: 12, textAlign: "center" }}>F1 = Fundament &middot; F2 = Momentum &middot; F3 = Dominantie &middot; F4 = Schaalslag</p>
+                  <p style={{ color: t.textDim, fontSize: 11, marginTop: 12, textAlign: "center" }}>F1 = Fundament &middot; F2 = Momentum &middot; F3 = Dominantie &middot; F4 = Schaalslag</p>
                 </div>
               )}
             </div>
@@ -1122,11 +1168,11 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
           {/* ══ FUNNEL MAP ══ */}
           {tab === "funnel" && (
             <div>
-              <SectionLabel>Funnel Map &mdash; Brunson vs {client.modelName}</SectionLabel>
-              <Card style={{ padding: 0, overflow: "hidden" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr", background: T.surface2, padding: "12px 18px", gap: 14, borderBottom: `1px solid ${T.border}` }}>
-                  <p style={{ color: T.textMuted, fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Element</p>
-                  <p style={{ color: T.amber, fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>ClickFunnels (Brunson)</p>
+              <SectionLabel t={t}>Funnel Map &mdash; Brunson vs {client.modelName}</SectionLabel>
+              <Card t={t} style={{ padding: 0, overflow: "hidden" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr", background: t.surface2, padding: "12px 18px", gap: 14, borderBottom: `1px solid ${t.border}` }}>
+                  <p style={{ color: t.textMuted, fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Element</p>
+                  <p style={{ color: t.amber, fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>ClickFunnels (Brunson)</p>
                   <p style={{ color: clientColor.main, fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>{client.name}</p>
                 </div>
                 {[
@@ -1137,10 +1183,10 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
                   { el: "Core Offer", br: "Software / dienst ($97-$297)", cl: client.frameworks.map(fw => fw.coreOffer?.[0]).filter(Boolean).join(" / ") || "\u2014" },
                   { el: "High Ticket", br: "Coaching / Mastermind ($10k-$25k+)", cl: client.frameworks.map(fw => fw.highTicket?.[0]).filter(Boolean).join(" / ") || "\u2014" },
                 ].map((row, i) => (
-                  <div key={i} style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr", padding: "12px 18px", gap: 14, borderBottom: `1px solid ${T.border}`, background: i % 2 === 0 ? T.bg : T.surface, alignItems: "start" }}>
-                    <p style={{ color: T.accent, fontSize: 13, fontWeight: 600, margin: 0 }}>{row.el}</p>
-                    <p style={{ color: T.textMuted, fontSize: 13, margin: 0, lineHeight: 1.5 }}>{row.br}</p>
-                    <p style={{ color: T.text, fontSize: 13, margin: 0, lineHeight: 1.5 }}>{row.cl}</p>
+                  <div key={i} style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr", padding: "12px 18px", gap: 14, borderBottom: `1px solid ${t.border}`, background: i % 2 === 0 ? t.bg : t.surface, alignItems: "start" }}>
+                    <p style={{ color: t.accent, fontSize: 13, fontWeight: 600, margin: 0 }}>{row.el}</p>
+                    <p style={{ color: t.textMuted, fontSize: 13, margin: 0, lineHeight: 1.5 }}>{row.br}</p>
+                    <p style={{ color: t.text, fontSize: 13, margin: 0, lineHeight: 1.5 }}>{row.cl}</p>
                   </div>
                 ))}
               </Card>
@@ -1150,20 +1196,20 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
           {/* ══ MASTER PROMPT ══ */}
           {tab === "prompt" && (
             <div>
-              <SectionLabel>Master Prompt</SectionLabel>
-              <Card style={{ marginBottom: 16 }}>
+              <SectionLabel t={t}>Master Prompt</SectionLabel>
+              <Card t={t} style={{ marginBottom: 16 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <Icon name="fileText" size={16} color={T.textMuted} />
-                    <p style={{ color: T.textSecondary, fontSize: 13, margin: 0 }}>{client.name} &middot; {client.frameworks.length} frameworks &middot; Fase 1-4 roadmap inbegrepen</p>
+                    <Icon name="fileText" size={16} color={t.textMuted} />
+                    <p style={{ color: t.textSecondary, fontSize: 13, margin: 0 }}>{client.name} &middot; {client.frameworks.length} frameworks &middot; Fase 1-4 roadmap inbegrepen</p>
                   </div>
                   <button onClick={copy}
                     style={{
                       display: "flex", alignItems: "center", gap: 6,
-                      background: copied ? T.green : T.accent,
-                      border: "none", borderRadius: T.radiusSm,
+                      background: copied ? t.green : t.accent,
+                      border: "none", borderRadius: t.radiusSm,
                       color: "#fff", padding: "10px 20px", cursor: "pointer",
-                      fontSize: 13, fontWeight: 600, fontFamily: T.fontBase,
+                      fontSize: 13, fontWeight: 600, fontFamily: t.fontBase,
                       transition: "all 0.2s ease",
                     }}>
                     <Icon name={copied ? "check" : "copy"} size={14} color="#fff" />
@@ -1172,10 +1218,10 @@ Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
                 </div>
               </Card>
               <pre style={{
-                background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.radius,
-                padding: 24, color: T.textSecondary, fontSize: 13, lineHeight: 1.8,
+                background: t.surface, border: `1px solid ${t.border}`, borderRadius: t.radius,
+                padding: 24, color: t.textSecondary, fontSize: 13, lineHeight: 1.8,
                 whiteSpace: "pre-wrap", wordBreak: "break-word",
-                fontFamily: T.fontMono, maxHeight: 520, overflowY: "auto",
+                fontFamily: t.fontMono, maxHeight: 520, overflowY: "auto",
               }}>
                 {prompt}
               </pre>
