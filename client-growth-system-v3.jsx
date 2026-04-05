@@ -433,70 +433,69 @@ const CLIENTS = [
     products: "Dine-in, Delivery (Glovo), Catering, Private Events, Iftar Service, Toeristische Ervaringen",
     audience: "Lokale stamgasten (60-70%), internationale toeristen, expats & digital nomads, zakelijke klanten",
     targetRevenue: "80000", currentRevenue: "0", status: "Concept Fase",
-    dreamGoal: "De plek waar locals elke dag terugkomen en toeristen speciaal voor omrijden \u2014 een onvergetelijke eet- en beleefervaring die Marokkaanse gastvrijheid op z'n best laat zien.",
-    modelName: "Horeca Growth Machine\u2122", notes: "Concept nog te bepalen. Mogelijke richtingen: modern Marokkaans restaurant, rooftop caf\u00E9, fusion concept, street food concept opgeschaald, of experience dining (kookworkshops + eten). Locatiestrategie: start in lokale wijk, bouw merk via social, expandeer naar toeristisch gebied. Valuta: MAD (Marokkaanse Dirham). Target in MAD: ~80.000 MAD/maand.",
+    dreamGoal: "Elke keer weer die perfecte plek vinden \u2014 heerlijk eten, warmte voelen, herinneringen maken, en altijd welkom zijn alsof je thuiskomt.",
+    modelName: "Tafel Vol Geluk Methode\u2122", notes: "Concept nog te bepalen. Mogelijke richtingen: modern Marokkaans restaurant, rooftop caf\u00E9, fusion concept, street food concept opgeschaald, of experience dining (kookworkshops + eten). Locatiestrategie: start in lokale wijk, bouw merk via social, expandeer naar toeristisch gebied. Valuta: MAD (Marokkaanse Dirham). Target in MAD: ~80.000 MAD/maand.",
     colorKey: "amber", icon: "sparkles",
     frameworks: [
-      { id: "zichtbaar", icon: "search", name: "Zichtbaarheid", subtitle: "Gevonden worden door locals \u00E9n toeristen", colorKey: "green",
-        description: "De basis leggen zodat je restaurant vindbaar, betrouwbaar en aantrekkelijk overkomt online \u2014 zowel voor lokale gasten als internationale bezoekers.",
-        steps: ["Google dominantie", "TripAdvisor ranking", "Social discovery", "Lokale reputatie"],
-        freeValue: ["Gratis proeverij bij opening (eerste 100 gasten)", "Recept PDF: 'Geheimen van de Marokkaanse Keuken'"],
+      { id: "smaak", icon: "star", name: "Authentieke Smaak", subtitle: "Echt, eerlijk, onvergetelijk lekker", colorKey: "amber",
+        description: "De klant ervaart bij elk bezoek consistente, authentieke smaken die nergens anders zo goed zijn \u2014 gerechten waar je voor terugkomt.",
+        steps: ["Ontdekken", "Proeven", "Herkennen", "Verlangen"],
+        freeValue: ["Recept PDF: 'Het Geheim van Onze Signature Tagine'", "Gratis proeverij bij grand opening (eerste 100 gasten)"],
         lowTicket: ["Lunchformule: 3-gangen voor 69 MAD", "Ontbijt + verse jus voor 39 MAD"],
-        coreOffer: ["Diner voor 2: compleet Marokkaans menu (250-400 MAD)", "Dagschotel + drankje lunchformule (80-120 MAD)"],
-        highTicket: ["Private dining ervaring: 6-personen tagine tafel (1.500 MAD)", "Kookworkshop + diner voor toeristen (500 MAD p.p.)"],
+        coreOffer: ["Compleet Marokkaans diner voor 2 (250-400 MAD)", "Dagschotel + drankje lunchformule (80-120 MAD)"],
+        highTicket: ["5-gangen Chef's Tasting Menu (500 MAD p.p.)", "Seizoensgebonden Private Tagine Tafel voor 6 (1.500 MAD)"],
         microFrameworks: [
-          { name: "Google & Maps Dominantie", icon: "search", steps: ["Google Business Profile 100% invullen: foto's, menu, uren, keywords AR/FR/EN", "Reviews strategie: QR-code op tafel naar Google review pagina", "Lokale SEO: 'restaurant + [stad]' keywords optimaliseren", "Google Ads op zoekintentie: 'best restaurant [stad]', 'where to eat [stad]'"] },
-          { name: "TripAdvisor Machine", icon: "star", steps: ["TripAdvisor profiel claimen en volledig optimaliseren", "Elke tevreden toerist vragen om review (kaartje bij rekening)", "Reageer op elke review binnen 24u (EN/FR)", "Doel: top 10 ranking in je stad binnen 6 maanden"] },
-          { name: "Social Discovery Engine", icon: "eye", steps: ["Instagram: 4-5x/week posten, focus op Reels (tagine reveals, keuken-behind-the-scenes)", "TikTok: raw keuken content, vuur, stoom, broodbakken \u2014 sensorisch content", "Content format: 'Instagrammable moments' cre\u00EBren in het restaurant (muren, presentatie)", "Influencer strategie: 5 food influencers per maand gratis uitnodigen"] },
+          { name: "Signature Gerechten Systeem", icon: "star", steps: ["3-5 signature dishes ontwikkelen die nergens anders bestaan", "Elk signature gerecht heeft een verhaal (herkomst, traditie, familie)", "Consistente kwaliteit: recepturen vastleggen op gram-niveau", "Seizoensmenu naast vaste kaart: schaarste + nieuwsgierigheid"] },
+          { name: "Smaakbeleving Design", icon: "eye", steps: ["Presentatie: elk bord is foto-waardig (kleuren, textuur, hoogte)", "Geur als eerste indruk: open keuken, verse kruiden, versgebakken brood", "Proeverij als verkooptool: 'Chef raadt aan' mini-proefbord bij twijfel", "Ingredi\u00EBnten verhaal op menukaart: waar komt het vandaan?"] },
         ]
       },
-      { id: "beleving", icon: "star", name: "Beleving", subtitle: "Van maaltijd naar onvergetelijk moment", colorKey: "amber",
-        description: "Het verschil maken door niet alleen eten te serveren, maar een complete ervaring neer te zetten \u2014 ambiance, service, verhaal en emotie.",
-        steps: ["Ambiance", "Service excellentie", "Storytelling", "Instagrammable moments"],
-        freeValue: ["Gratis Marokkaanse thee bij binnenkomst", "Storytelling kaartje bij elk gerecht (herkomst ingredi\u00EBnten)"],
-        lowTicket: ["Dessert upgrade voor 25 MAD", "Speciale cocktail/mocktail van de maand 45 MAD"],
-        coreOffer: ["5-gangen Marokkaans tasting menu (350-500 MAD)", "Chef's table experience (600 MAD p.p.)"],
-        highTicket: ["Private rooftop dinner voor groepen (3.000+ MAD)", "Complete bruiloftscatering (vanaf 25.000 MAD)"],
+      { id: "welkom", icon: "heart", name: "Warm Welkom", subtitle: "Gezien, gewaardeerd, als familie", colorKey: "rose",
+        description: "Vanaf het moment dat je binnenkomt voel je je gezien en welkom \u2014 niet als klant, maar als gast die ertoe doet.",
+        steps: ["Binnenkomst", "Herkenning", "Persoonlijke aandacht", "Warm afscheid"],
+        freeValue: ["Gratis Marokkaanse muntthee bij binnenkomst voor elke gast", "Kinderen: kleurplaat + limonade gratis"],
+        lowTicket: ["Welkomstamuse bij reservering vooraf (15 MAD)", "Verse broodmand upgrade met 5 dips (25 MAD)"],
+        coreOffer: ["Verjaardags-arrangement: taart + decoratie + foto (350 MAD)", "Familie-tafel: gedeeld menu voor 4-8 personen (500-900 MAD)"],
+        highTicket: ["Private dining room met persoonlijke gastheer (2.000+ MAD)", "Bruiloft/feest catering met volledige service (vanaf 25.000 MAD)"],
         microFrameworks: [
-          { name: "Ambiance & Design", icon: "layout", steps: ["Interieur dat foto-waardig is: verlichting, kleuren, details", "Muziek: live Gnawa/jazz avonden (weekenden)", "Signature geuren: verse munt, gebrand brood, specerijen bij ingang", "Seizoensgebonden decoratie: Ramadan, zomer terras, kerst"] },
-          { name: "Service Protocol", icon: "shield", steps: ["Welkomstritueel: thee + amuse bij elke tafel", "Personeel training: talen (AR/FR/EN), menukennis, upsell technieken", "Kinderen welkom: kleurplaat + mini-menu = families trekken", "Vertrekritueel: bedankkaartje + QR code review + 'tot snel'"] },
+          { name: "Welkomst Ritueel", icon: "heart", steps: ["Deur openhouden + oogcontact + 'Marhba bik' bij binnenkomst", "Muntthee serveren binnen 60 seconden na plaatsnemen", "Naam onthouden van terugkerende gasten (notities in reserveringssysteem)", "Kinderen actief verwelkomen: ouders ontspannen = langere tafel + meer besteding"] },
+          { name: "Afscheid & Herinnering", icon: "gift", steps: ["Bedankkaartje met handgeschreven 'Shukran' bij rekening", "Kleine meeneem-attentie: koekje, snoepje of munt voor onderweg", "Foto-moment aanbieden bij speciale gelegenheden", "'Tot snel!' + QR-code naar Google review op afscheidskaartje"] },
         ]
       },
-      { id: "loyaliteit", icon: "heart", name: "Loyaliteit", subtitle: "Eenmalige gast wordt stamgast", colorKey: "rose",
-        description: "Systemen bouwen die ervoor zorgen dat gasten terugkomen, vaker bestellen en je aanbevelen aan anderen.",
-        steps: ["Eerste bezoek wow", "Terugkeer triggers", "Stamgast status", "Ambassadeur"],
-        freeValue: ["Gratis dessert bij 3e bezoek", "WhatsApp groep: 'Vrienden van [Naam]' met exclusieve deals"],
-        lowTicket: ["Stempelkaart: 10e maaltijd gratis", "Verjaardagsdeal: gratis taart bij reservering"],
-        coreOffer: ["Stamgast pas: 15% korting op alles + prioriteit reservering (200 MAD/jaar)", "Maandelijks catering abonnement voor kantoren (2.500 MAD/maand)"],
-        highTicket: ["VIP Membership: 1x/maand chef's table + 20% korting + prioriteit events (5.000 MAD/jaar)", "Corporate catering jaarcontract (vanaf 30.000 MAD/jaar)"],
+      { id: "gemak", icon: "shield", name: "Zorgeloos Genieten", subtitle: "Makkelijk, eerlijk, geen verrassingen", colorKey: "green",
+        description: "De klant hoeft nergens over na te denken \u2014 reserveren is simpel, prijzen zijn eerlijk, en alles klopt gewoon.",
+        steps: ["Vinden", "Reserveren", "Bestellen", "Betalen"],
+        freeValue: ["Online menu met prijzen (geen verrassingen)", "WhatsApp reservering: reply = geboekt"],
+        lowTicket: ["Lunch deal-of-the-day via WhatsApp status (59-79 MAD)", "Early bird korting: 15% voor reserveringen voor 18:00"],
+        coreOffer: ["All-in formules: starter + hoofd + dessert + drankje (150-250 MAD)", "Delivery via Glovo/eigen WhatsApp (80-120 MAD)"],
+        highTicket: ["Maandelijks lunch-abonnement voor kantoren (2.500 MAD/maand)", "Corporate stamgast-pas: 20% korting + prioriteit reservering (500 MAD/kwartaal)"],
         microFrameworks: [
-          { name: "Retentie Systeem", icon: "activity", steps: ["WhatsApp Business: reserveringen, menu van de dag, speciale avonden", "Na 1e bezoek: WhatsApp bericht 'Bedankt! Hier is 10% korting voor je volgende bezoek'", "30-dagen geen bezoek: 'We missen je' bericht met special deal", "Seizoenscampagnes: Ramadan iftar pakket, zomer terras opening, Nieuwjaar menu"] },
-          { name: "Referral Engine", icon: "handshake", steps: ["'Breng een vriend' actie: beide krijgen gratis dessert", "QR-code kaartje meegeven: 'Deel deze ervaring \u2014 je vriend krijgt gratis thee bij eerste bezoek'", "Instagram tag actie: tag ons + deel foto = kans op gratis diner", "Google review beloning: review = gratis koffie bij volgend bezoek"] },
+          { name: "Frictionless Booking", icon: "calendar", steps: ["WhatsApp Business: stuur 'Tafel voor 2 vanavond' = bevestiging binnen 5 min", "Google reserveer-knop actief op Google Business profiel", "Instagram bio link naar direct reserveren", "Automatische herinnering 4u voor reservering via WhatsApp"] },
+          { name: "Transparante Ervaring", icon: "eye", steps: ["Menu met duidelijke prijzen online + in zaak (AR/FR/EN)", "Geen verborgen servicekosten \u2014 prijs = prijs", "Allergenen en dieetwensen duidelijk aangegeven per gerecht", "Betaalopties: cash, kaart, mobiel \u2014 alles werkt, geen gedoe"] },
+          { name: "Delivery & Thuis", icon: "package", steps: ["Glovo profiel met professionele foto's en duidelijke menu", "Eigen WhatsApp delivery in directe omgeving (geen commissie)", "Delivery menu: hoge-marge items die goed reizen (wraps, bowls, tagine)", "Iftar-box voor thuis tijdens Ramadan: compleet voor 2-4 personen"] },
         ]
       },
-      { id: "omzet", icon: "dollarSign", name: "Omzetverbreding", subtitle: "Meer verdienen per gast en buiten de zaak", colorKey: "blue",
-        description: "Omzet diversifi\u00EBren via delivery, catering, events en toeristische producten \u2014 zodat je niet alleen afhankelijk bent van dine-in.",
-        steps: ["Delivery lanceren", "Catering opbouwen", "Events & private dining", "Toeristische producten"],
-        freeValue: ["Gratis receptenboekje bij eerste delivery bestelling", "Proefpakket Marokkaanse specerijen bij catering aanvraag"],
-        lowTicket: ["Delivery lunchbox 59-89 MAD", "Iftar box voor thuis (2 personen) 149 MAD"],
-        coreOffer: ["Catering voor events: 150-250 MAD p.p.", "Private dining: 400-600 MAD p.p. (min 6 personen)"],
-        highTicket: ["Bruiloftscatering compleet: vanaf 25.000 MAD", "Corporate event hosting + catering: vanaf 15.000 MAD"],
+      { id: "momenten", icon: "sparkles", name: "Bijzondere Momenten", subtitle: "De perfecte plek voor herinneringen", colorKey: "blue",
+        description: "Voor verjaardagen, date nights, familiefeesten of gewoon een avond die je niet vergeet \u2014 hier worden herinneringen gemaakt.",
+        steps: ["Aanleiding", "Verwachting", "Beleving", "Herinnering"],
+        freeValue: ["Verjaardagskaars + lied van het team (gratis bij reservering)", "Instagram-waardige foto-hoek in het restaurant"],
+        lowTicket: ["Dessert upgrade: signature patisserie (25-45 MAD)", "Speciale cocktail/mocktail van de maand (45 MAD)"],
+        coreOffer: ["Date night arrangement: 4-gangen + kaars + muziek (400 MAD voor 2)", "Kookworkshop + diner: zelf je tagine maken (500 MAD p.p.)"],
+        highTicket: ["Private rooftop dinner met live muziek voor groepen (3.000+ MAD)", "Complete event hosting: bruiloft, verjaardag, corporate (15.000+ MAD)"],
         microFrameworks: [
-          { name: "Delivery & Glovo", icon: "package", steps: ["Glovo/Jumia Food profiel optimaliseren: foto's, beschrijvingen, prijzen", "Delivery-only menu: hoge marge items die goed reizen (wraps, bowls, tagine)", "Eigen WhatsApp delivery in directe omgeving (geen commissie)", "Cloud kitchen concept overwegen als delivery groeit (lagere kosten)"] },
-          { name: "Catering & Events Machine", icon: "briefcase", steps: ["Catering menu samenstellen: 3 pakketten (basis/premium/luxe)", "Ramadan iftar catering actief promoten 2 maanden vooruit", "B2B: hotels, bedrijven, wedding planners benaderen", "Portfolio opbouwen: foto's van elk event voor social proof"] },
-          { name: "Toeristen Producten", icon: "mapPin", steps: ["Kookworkshop op Viator/GetYourGuide/Airbnb Experiences plaatsen", "Marokkaanse eetervaring pakket: marktbezoek + koken + eten (500 MAD p.p.)", "Hotel partnerships: exclusief menu/korting voor hotelgasten", "Tripadvisor 'Experience' listing aanmaken en optimaliseren"] },
+          { name: "Seizoen & Event Kalender", icon: "calendar", steps: ["Ramadan: iftar menu + sfeerverlichting + speciale openingstijden", "Zomer: terras opening event, zomerse kaart, live muziek vrijdagavond", "Koningsdag/nationale feestdagen: speciaal thema-menu", "Kerst/NYE: exclusief eindejaars-menu met reservering-only"] },
+          { name: "Experience Design", icon: "layout", steps: ["Interieur met 2-3 'Instagrammable' fotospots (muren, verlichting, details)", "Live Gnawa/jazz muziek op weekend-avonden", "Chef's table: koken voor je ogen met uitleg en verhaal", "Kookworkshop voor toeristen: marktbezoek + koken + samen eten (Viator/Airbnb)"] },
         ]
       },
-      { id: "schaal", icon: "rocket", name: "Schaalslag", subtitle: "Van 1 zaak naar een merk", colorKey: "gold",
-        description: "Van een succesvol restaurant naar een schaalbaar merk \u2014 via franchising, meerdere locaties, of productlijnen.",
-        steps: ["Merk bouwen", "Systemen documenteren", "Tweede locatie", "Productlijn"],
-        freeValue: ["Gratis e-book: 'Hoe Wij Horeca Doen' (merkbekendheid)", "Social content serie: 'Van Idee tot Zaak'"],
-        lowTicket: ["Branded specerijen/sauzen verkoop in restaurant (30-60 MAD)", "Merchandise: tassen, mokken, schorten (50-100 MAD)"],
-        coreOffer: ["Tweede locatie openen (toeristisch gebied)", "Franchise model documenteren en pitchen"],
-        highTicket: ["Franchise licentie verkopen (vanaf 200.000 MAD)", "Branded productlijn: retail specerijen/sauzen in supermarkten"],
+      { id: "thuis", icon: "crown", name: "Tweede Thuis", subtitle: "Meer dan een gast \u2014 je hoort erbij", colorKey: "gold",
+        description: "De ultieme staat: je voelt je hier zo thuis dat je het aan iedereen aanraadt, altijd terugkomt, en onderdeel bent van de community.",
+        steps: ["Herkenning", "Ritueel", "Community", "Ambassadeur"],
+        freeValue: ["WhatsApp community: 'Vrienden van [Naam]' met exclusieve previews", "Gratis koffie op je verjaardag"],
+        lowTicket: ["Stempelkaart: 10e bezoek = gratis hoofdgerecht", "Verjaardagsdeal: gratis dessert bij reservering in je geboortemaand"],
+        coreOffer: ["Stamgast pas: 15% korting + prioriteit + verrassingen (200 MAD/jaar)", "Catering abonnement: wekelijkse levering voor kantoor/thuis (vanaf 1.500 MAD/maand)"],
+        highTicket: ["VIP Membership: maandelijks chef's table + 20% korting + events (5.000 MAD/jaar)", "Founding Member: levenslang 25% korting + naamplaat op 'Wall of Fame' (10.000 MAD eenmalig)"],
         microFrameworks: [
-          { name: "Merk & Branding", icon: "award", steps: ["Merkverhaal vastleggen: oorsprong, missie, waarden, persoonlijkheid", "Consistent visueel: logo, kleuren, verpakking, interieur = herkenbaar", "PR: food bloggers, journalisten, TV uitnodigen", "Awards: inschrijven voor lokale/nationale restaurant awards"] },
-          { name: "Schaalbaarheid", icon: "layers", steps: ["SOP's (Standard Operating Procedures) documenteren voor keuken + service", "Leveranciers contracten: volume pricing bij groei", "Managementteam opleiden: zaak moet draaien zonder eigenaar", "Financieel model: breakeven, margines, groeipad per locatie uitwerken"] },
+          { name: "Stamgast Herkenning", icon: "user", steps: ["Naam en voorkeuren bijhouden in reserveringssysteem", "'Uw vaste tafel?' \u2014 terugkerende gasten krijgen hun plek", "Persoonlijk WhatsApp bericht bij nieuw seizoensmenu: 'Dit moet je proeven'", "Verjaardag/jubileum herinnering: automatisch felicitatie + aanbieding"] },
+          { name: "Community & Ambassadeurs", icon: "handshake", steps: ["'Breng een vriend' actie: beide krijgen gratis dessert", "Instagram tag actie: tag + deel foto = kans op gratis diner voor 2", "Google review beloning: review schrijven = gratis koffie bij volgend bezoek", "Trouwe gasten uitnodigen voor exclusieve menu previews en proeverijen"] },
         ]
       },
     ]
@@ -642,7 +641,31 @@ export default function ClientSystem() {
   const activeMf = (fwView && fwView.microIndex !== undefined && activeFw) ? activeFw.microFrameworks[fwView.microIndex] : null;
   const phaseObj = activePhase !== null ? roadmap[activePhase] : null;
 
-  const prompt = `Je bent een expert marketeer, funnel-architect en groeistrateeg voor lokale ondernemers in Nederland. Jij helpt mij \u2014 een AI-automation consultant \u2014 om voor mijn klant een volledig uitgewerkt groeiplan te maken op basis van het bewezen framework hieronder.
+  const prompt = `Je bent een expert marketeer, funnel-architect en groeistrateeg. Jij helpt mij \u2014 een AI-automation consultant \u2014 om voor mijn klant een volledig uitgewerkt groeiplan te maken.
+
+== METHODOLOGIE: DROOMRESULTAAT + CORE RESULTS ==
+
+Dit framework draait om \u00E9\u00E9n principe: de KLANT staat centraal, niet het bedrijf.
+
+DROOMRESULTAAT = De ultieme emotionele staat die de eindklant wil bereiken.
+- Altijd geschreven vanuit klantperspectief ("Ik wil...")
+- Beschrijft een GEVOEL, niet een product of dienst
+- Voorbeeld: "Genieten van je auto, zonder stress, onverwachte kosten of onzekerheid"
+
+CORE RESULTS = De 3-5 deelresultaten die de klant moet BEREIKEN om het droomresultaat te voelen.
+- Elke Core Result is een PIJLER vanuit klantperspectief
+- Het is GEEN marketingfase (niet: "zichtbaarheid", "retentie", "schaalslag")
+- Het is W\u00C1T de klant ervaart/voelt/bereikt
+- Samen vormen alle Core Results het complete droomresultaat
+- Voorbeeld (auto): "Slimme Start" = juiste auto gekocht zonder spijt; "Voorspelbare Kosten" = nooit verrast door rekeningen
+
+Per Core Result bouw je een VALUE LADDER:
+1. Free Value \u2014 gratis weggever die het probleem benoemt en eerste vertrouwen wekt
+2. Low Ticket \u2014 kleine betaalde actie die de klant een eerste resultaat geeft
+3. Core Offer \u2014 het hoofdproduct dat het Core Result volledig levert
+4. High Ticket \u2014 premium versie met maximale zekerheid, gemak of exclusiviteit
+
+Per Core Result heb je MICRO-FRAMEWORKS: stap-voor-stap processen (3-4 stappen) die het bedrijf uitvoert om dat resultaat te leveren.
 
 == KLANTPROFIEL ==
 Bedrijfsnaam: ${client.name} | Type: ${client.type} | Locatie: ${client.location}
@@ -654,12 +677,15 @@ Framework naam: ${client.modelName}
 Droomdoel eindklant: "${client.dreamGoal}"
 ${client.notes ? `Extra context: ${client.notes}` : ""}
 
-== FRAMEWORK STRUCTUUR (${client.frameworks.length} Core Results) ==
+== HUIDIGE CORE RESULTS (${client.frameworks.length} pijlers) ==
 ${client.frameworks.map((fw, i) => `${i + 1}. ${fw.name} (${fw.subtitle})
+   Klantperspectief: ${fw.description}
+   Stappen: ${fw.steps.join(" \u2192 ")}
    Free Value: ${fw.freeValue?.join(" / ") || "n.v.t."}
    Low Ticket: ${fw.lowTicket?.join(" / ") || "n.v.t."}
    Core Offer: ${fw.coreOffer?.join(" / ") || "n.v.t."}
-   High Ticket: ${fw.highTicket?.join(" / ") || "n.v.t."}`).join("\n\n")}
+   High Ticket: ${fw.highTicket?.join(" / ") || "n.v.t."}
+   Micro-Frameworks: ${fw.microFrameworks?.map(mf => mf.name).join(", ") || "n.v.t."}`).join("\n\n")}
 
 == ROADMAP FASEN ==
 Fase 1 Fundament (M1-3): Target \u20AC${Math.round(parseInt(client.targetRevenue)*0.35).toLocaleString("nl-NL")}/maand
@@ -668,15 +694,17 @@ Fase 3 Dominantie (M7-9): Target \u20AC${Math.round(parseInt(client.targetRevenu
 Fase 4 Schaalslag (M10-12): Target \u20AC${Math.round(parseInt(client.targetRevenue)*1.40).toLocaleString("nl-NL")}/maand
 
 == OPDRACHT ==
-1. DROOMDOEL ANALYSE \u2014 3 pijnen + 3 verborgen verlangens
-2. FASE 1 WEEKPLAN \u2014 volledig uitgewerkt per week (week 1-12)
-3. CONTENT KALENDER \u2014 30 posts uitgeschreven (dag, format, hook, caption)
-4. META ADS STRATEGIE \u2014 per Core Result: angle, targeting, ad copy
-5. WHATSAPP SCRIPTS \u2014 welkomst, bevestiging, reminder, nazorg, review, heractivering
-6. OMZETBEREKENING \u2014 breakdown per product naar \u20AC${client.targetRevenue}/maand
-7. FREE VALUE CONTENT \u2014 per Core Result de gratis weggever volledig uitgeschreven
+1. DROOMDOEL VALIDATIE \u2014 Is het droomresultaat echt vanuit klantperspectief? Zijn er 3 diepe pijnen en 3 verborgen verlangens die hieronder zitten?
+2. CORE RESULTS CHECK \u2014 Zijn alle Core Results vanuit KLANT-perspectief geschreven (niet vanuit bedrijf/marketing)? Vormen ze samen het complete droomresultaat? Mis ik er een? Is er een teveel?
+3. VALUE LADDER PER CORE RESULT \u2014 Per Core Result: is de Free Value \u2192 Low Ticket \u2192 Core Offer \u2192 High Ticket logisch opgebouwd? Verbeter waar nodig.
+4. MICRO-FRAMEWORKS \u2014 Per Core Result: welke stap-voor-stap processen voert het bedrijf uit om dit resultaat te leveren? (2-3 micro-frameworks per Core Result, elk 3-4 stappen)
+5. FASE 1 WEEKPLAN \u2014 Volledig uitgewerkt per week (week 1-12): welke Core Results activeer je wanneer?
+6. CONTENT KALENDER \u2014 30 posts uitgeschreven (dag, format, hook, caption) \u2014 elke post gekoppeld aan een Core Result
+7. OMZETBEREKENING \u2014 Breakdown per product/Core Result naar \u20AC${client.targetRevenue}/maand
 
-Schrijf alles in het Nederlands. Concreet, direct toepasbaar.`;
+KRITISCHE REGEL: Schrijf ALLES vanuit het perspectief van de eindklant. Core Results zijn geen marketingtermen, maar emotionele resultaten die de klant ervaart.
+
+Schrijf in het Nederlands. Concreet, direct toepasbaar.`;
 
   function copy() { navigator.clipboard.writeText(prompt); setCopied(true); setTimeout(() => setCopied(false), 2200); }
 
