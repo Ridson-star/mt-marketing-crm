@@ -427,6 +427,80 @@ const CLIENTS = [
       },
     ]
   },
+  {
+    id: "horeca_ma", name: "Horeca Marokko", type: "Restaurant / Caf\u00E9 (Concept TBD)",
+    location: "Marokko", owner: "TBD",
+    products: "Dine-in, Delivery (Glovo), Catering, Private Events, Iftar Service, Toeristische Ervaringen",
+    audience: "Lokale stamgasten (60-70%), internationale toeristen, expats & digital nomads, zakelijke klanten",
+    targetRevenue: "80000", currentRevenue: "0", status: "Concept Fase",
+    dreamGoal: "De plek waar locals elke dag terugkomen en toeristen speciaal voor omrijden \u2014 een onvergetelijke eet- en beleefervaring die Marokkaanse gastvrijheid op z'n best laat zien.",
+    modelName: "Horeca Growth Machine\u2122", notes: "Concept nog te bepalen. Mogelijke richtingen: modern Marokkaans restaurant, rooftop caf\u00E9, fusion concept, street food concept opgeschaald, of experience dining (kookworkshops + eten). Locatiestrategie: start in lokale wijk, bouw merk via social, expandeer naar toeristisch gebied. Valuta: MAD (Marokkaanse Dirham). Target in MAD: ~80.000 MAD/maand.",
+    colorKey: "amber", icon: "sparkles",
+    frameworks: [
+      { id: "zichtbaar", icon: "search", name: "Zichtbaarheid", subtitle: "Gevonden worden door locals \u00E9n toeristen", colorKey: "green",
+        description: "De basis leggen zodat je restaurant vindbaar, betrouwbaar en aantrekkelijk overkomt online \u2014 zowel voor lokale gasten als internationale bezoekers.",
+        steps: ["Google dominantie", "TripAdvisor ranking", "Social discovery", "Lokale reputatie"],
+        freeValue: ["Gratis proeverij bij opening (eerste 100 gasten)", "Recept PDF: 'Geheimen van de Marokkaanse Keuken'"],
+        lowTicket: ["Lunchformule: 3-gangen voor 69 MAD", "Ontbijt + verse jus voor 39 MAD"],
+        coreOffer: ["Diner voor 2: compleet Marokkaans menu (250-400 MAD)", "Dagschotel + drankje lunchformule (80-120 MAD)"],
+        highTicket: ["Private dining ervaring: 6-personen tagine tafel (1.500 MAD)", "Kookworkshop + diner voor toeristen (500 MAD p.p.)"],
+        microFrameworks: [
+          { name: "Google & Maps Dominantie", icon: "search", steps: ["Google Business Profile 100% invullen: foto's, menu, uren, keywords AR/FR/EN", "Reviews strategie: QR-code op tafel naar Google review pagina", "Lokale SEO: 'restaurant + [stad]' keywords optimaliseren", "Google Ads op zoekintentie: 'best restaurant [stad]', 'where to eat [stad]'"] },
+          { name: "TripAdvisor Machine", icon: "star", steps: ["TripAdvisor profiel claimen en volledig optimaliseren", "Elke tevreden toerist vragen om review (kaartje bij rekening)", "Reageer op elke review binnen 24u (EN/FR)", "Doel: top 10 ranking in je stad binnen 6 maanden"] },
+          { name: "Social Discovery Engine", icon: "eye", steps: ["Instagram: 4-5x/week posten, focus op Reels (tagine reveals, keuken-behind-the-scenes)", "TikTok: raw keuken content, vuur, stoom, broodbakken \u2014 sensorisch content", "Content format: 'Instagrammable moments' cre\u00EBren in het restaurant (muren, presentatie)", "Influencer strategie: 5 food influencers per maand gratis uitnodigen"] },
+        ]
+      },
+      { id: "beleving", icon: "star", name: "Beleving", subtitle: "Van maaltijd naar onvergetelijk moment", colorKey: "amber",
+        description: "Het verschil maken door niet alleen eten te serveren, maar een complete ervaring neer te zetten \u2014 ambiance, service, verhaal en emotie.",
+        steps: ["Ambiance", "Service excellentie", "Storytelling", "Instagrammable moments"],
+        freeValue: ["Gratis Marokkaanse thee bij binnenkomst", "Storytelling kaartje bij elk gerecht (herkomst ingredi\u00EBnten)"],
+        lowTicket: ["Dessert upgrade voor 25 MAD", "Speciale cocktail/mocktail van de maand 45 MAD"],
+        coreOffer: ["5-gangen Marokkaans tasting menu (350-500 MAD)", "Chef's table experience (600 MAD p.p.)"],
+        highTicket: ["Private rooftop dinner voor groepen (3.000+ MAD)", "Complete bruiloftscatering (vanaf 25.000 MAD)"],
+        microFrameworks: [
+          { name: "Ambiance & Design", icon: "layout", steps: ["Interieur dat foto-waardig is: verlichting, kleuren, details", "Muziek: live Gnawa/jazz avonden (weekenden)", "Signature geuren: verse munt, gebrand brood, specerijen bij ingang", "Seizoensgebonden decoratie: Ramadan, zomer terras, kerst"] },
+          { name: "Service Protocol", icon: "shield", steps: ["Welkomstritueel: thee + amuse bij elke tafel", "Personeel training: talen (AR/FR/EN), menukennis, upsell technieken", "Kinderen welkom: kleurplaat + mini-menu = families trekken", "Vertrekritueel: bedankkaartje + QR code review + 'tot snel'"] },
+        ]
+      },
+      { id: "loyaliteit", icon: "heart", name: "Loyaliteit", subtitle: "Eenmalige gast wordt stamgast", colorKey: "rose",
+        description: "Systemen bouwen die ervoor zorgen dat gasten terugkomen, vaker bestellen en je aanbevelen aan anderen.",
+        steps: ["Eerste bezoek wow", "Terugkeer triggers", "Stamgast status", "Ambassadeur"],
+        freeValue: ["Gratis dessert bij 3e bezoek", "WhatsApp groep: 'Vrienden van [Naam]' met exclusieve deals"],
+        lowTicket: ["Stempelkaart: 10e maaltijd gratis", "Verjaardagsdeal: gratis taart bij reservering"],
+        coreOffer: ["Stamgast pas: 15% korting op alles + prioriteit reservering (200 MAD/jaar)", "Maandelijks catering abonnement voor kantoren (2.500 MAD/maand)"],
+        highTicket: ["VIP Membership: 1x/maand chef's table + 20% korting + prioriteit events (5.000 MAD/jaar)", "Corporate catering jaarcontract (vanaf 30.000 MAD/jaar)"],
+        microFrameworks: [
+          { name: "Retentie Systeem", icon: "activity", steps: ["WhatsApp Business: reserveringen, menu van de dag, speciale avonden", "Na 1e bezoek: WhatsApp bericht 'Bedankt! Hier is 10% korting voor je volgende bezoek'", "30-dagen geen bezoek: 'We missen je' bericht met special deal", "Seizoenscampagnes: Ramadan iftar pakket, zomer terras opening, Nieuwjaar menu"] },
+          { name: "Referral Engine", icon: "handshake", steps: ["'Breng een vriend' actie: beide krijgen gratis dessert", "QR-code kaartje meegeven: 'Deel deze ervaring \u2014 je vriend krijgt gratis thee bij eerste bezoek'", "Instagram tag actie: tag ons + deel foto = kans op gratis diner", "Google review beloning: review = gratis koffie bij volgend bezoek"] },
+        ]
+      },
+      { id: "omzet", icon: "dollarSign", name: "Omzetverbreding", subtitle: "Meer verdienen per gast en buiten de zaak", colorKey: "blue",
+        description: "Omzet diversifi\u00EBren via delivery, catering, events en toeristische producten \u2014 zodat je niet alleen afhankelijk bent van dine-in.",
+        steps: ["Delivery lanceren", "Catering opbouwen", "Events & private dining", "Toeristische producten"],
+        freeValue: ["Gratis receptenboekje bij eerste delivery bestelling", "Proefpakket Marokkaanse specerijen bij catering aanvraag"],
+        lowTicket: ["Delivery lunchbox 59-89 MAD", "Iftar box voor thuis (2 personen) 149 MAD"],
+        coreOffer: ["Catering voor events: 150-250 MAD p.p.", "Private dining: 400-600 MAD p.p. (min 6 personen)"],
+        highTicket: ["Bruiloftscatering compleet: vanaf 25.000 MAD", "Corporate event hosting + catering: vanaf 15.000 MAD"],
+        microFrameworks: [
+          { name: "Delivery & Glovo", icon: "package", steps: ["Glovo/Jumia Food profiel optimaliseren: foto's, beschrijvingen, prijzen", "Delivery-only menu: hoge marge items die goed reizen (wraps, bowls, tagine)", "Eigen WhatsApp delivery in directe omgeving (geen commissie)", "Cloud kitchen concept overwegen als delivery groeit (lagere kosten)"] },
+          { name: "Catering & Events Machine", icon: "briefcase", steps: ["Catering menu samenstellen: 3 pakketten (basis/premium/luxe)", "Ramadan iftar catering actief promoten 2 maanden vooruit", "B2B: hotels, bedrijven, wedding planners benaderen", "Portfolio opbouwen: foto's van elk event voor social proof"] },
+          { name: "Toeristen Producten", icon: "mapPin", steps: ["Kookworkshop op Viator/GetYourGuide/Airbnb Experiences plaatsen", "Marokkaanse eetervaring pakket: marktbezoek + koken + eten (500 MAD p.p.)", "Hotel partnerships: exclusief menu/korting voor hotelgasten", "Tripadvisor 'Experience' listing aanmaken en optimaliseren"] },
+        ]
+      },
+      { id: "schaal", icon: "rocket", name: "Schaalslag", subtitle: "Van 1 zaak naar een merk", colorKey: "gold",
+        description: "Van een succesvol restaurant naar een schaalbaar merk \u2014 via franchising, meerdere locaties, of productlijnen.",
+        steps: ["Merk bouwen", "Systemen documenteren", "Tweede locatie", "Productlijn"],
+        freeValue: ["Gratis e-book: 'Hoe Wij Horeca Doen' (merkbekendheid)", "Social content serie: 'Van Idee tot Zaak'"],
+        lowTicket: ["Branded specerijen/sauzen verkoop in restaurant (30-60 MAD)", "Merchandise: tassen, mokken, schorten (50-100 MAD)"],
+        coreOffer: ["Tweede locatie openen (toeristisch gebied)", "Franchise model documenteren en pitchen"],
+        highTicket: ["Franchise licentie verkopen (vanaf 200.000 MAD)", "Branded productlijn: retail specerijen/sauzen in supermarkten"],
+        microFrameworks: [
+          { name: "Merk & Branding", icon: "award", steps: ["Merkverhaal vastleggen: oorsprong, missie, waarden, persoonlijkheid", "Consistent visueel: logo, kleuren, verpakking, interieur = herkenbaar", "PR: food bloggers, journalisten, TV uitnodigen", "Awards: inschrijven voor lokale/nationale restaurant awards"] },
+          { name: "Schaalbaarheid", icon: "layers", steps: ["SOP's (Standard Operating Procedures) documenteren voor keuken + service", "Leveranciers contracten: volume pricing bij groei", "Managementteam opleiden: zaak moet draaien zonder eigenaar", "Financieel model: breakeven, margines, groeipad per locatie uitwerken"] },
+        ]
+      },
+    ]
+  },
 ];
 
 const TABS = [
