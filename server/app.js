@@ -91,16 +91,21 @@ function normalizeClient(parsed) {
   };
 }
 
-/** Geen /api-prefix: op Vercel hangt deze app onder /api */
+/**
+ * Lokaal (Vite-proxy strip /api): POST /onboard-client
+ * Vercel: POST /api/onboard-client — zelfde router dubbel gemount
+ */
 const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: "512kb" }));
 
-app.get("/health", (_req, res) => {
+const apiRouter = express.Router();
+
+apiRouter.get("/health", (_req, res) => {
   res.json({ ok: true, model: MODEL });
 });
 
-app.post("/onboard-client", async (req, res) => {
+apiRouter.post("/onboard-client", async (req, res) => {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return res.status(503).json({ error: "ANTHROPIC_API_KEY ontbreekt. Zet deze in Vercel Environment Variables of lokaal in .env" });
@@ -150,6 +155,9 @@ app.post("/onboard-client", async (req, res) => {
     return res.status(500).json({ error: msg });
   }
 });
+
+app.use(apiRouter);
+app.use("/api", apiRouter);
 
 export default app;
 export { normalizeClient, extractJson, MODEL };
