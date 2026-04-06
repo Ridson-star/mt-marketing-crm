@@ -3,7 +3,7 @@ import cors from "cors";
 import Anthropic from "@anthropic-ai/sdk";
 import { ONBOARD_SYSTEM } from "./methodology.js";
 
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-3-5-sonnet-20241022";
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
 const ALLOWED_ICONS = new Set([
   "sparkles", "heart", "car", "user", "star", "shield", "crown", "activity", "search", "briefcase", "rocket",
