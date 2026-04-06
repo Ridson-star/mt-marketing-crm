@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 
+/** Productie: zet VITE_API_BASE_URL (bv. https://jouw-api.railway.app) — lokaal leeg laten voor Vite-proxy. */
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+
 // ─── DESIGN TOKENS ──────────────────────────────────────────────────────────
 const SHARED = {
   radius: 12, radiusSm: 8, radiusLg: 16, radiusXl: 20,
@@ -115,13 +118,14 @@ function Icon({ name, size = 18, color = "currentColor", style: s }) {
 }
 
 // ─── ROADMAP DATA ───────────────────────────────────────────────────────────
-function buildRoadmap(targetRevenue) {
-  const t = parseInt(targetRevenue) || 10000;
+function buildRoadmap(targetRevenue, themeKey = "dark") {
+  const rev = parseInt(String(targetRevenue), 10) || 10000;
+  const pal = THEMES[themeKey] || THEMES.dark;
   return [
     {
       phase: 1, name: "Fundament", icon: "layers",
-      timeline: "Maand 1-3", color: t.green, colorKey: "green",
-      revenueTarget: Math.round(t * 0.35),
+      timeline: "Maand 1-3", color: pal.green, colorKey: "green",
+      revenueTarget: Math.round(rev * 0.35),
       tagline: "Digitale basis, eerste betalende klanten, systemen opzetten",
       status: "active",
       goals: [
@@ -135,7 +139,7 @@ function buildRoadmap(targetRevenue) {
         { label: "Week 1-2", title: "Digitale basis", tasks: ["Google Business: foto's, uren, beschrijving, keywords", "WhatsApp Business: catalogus, welkomstbericht, auto-reply", "Instagram bio + highlights + eerste 9 posts", "Booking tool activeren (Fresha of Calendly)"] },
         { label: "Week 3-4", title: "Founding Member lancering", tasks: ["Founding Member deal: max 25 plekken, tijdlimiet", "Deel via Instagram Stories, WhatsApp status, Facebook buurtgroepen", "Eerste Meta Ad: \u20AC5-10/dag, gratis analyse als lead", "5 micro-influencers (1k-15k) benaderen voor gratis sessie"] },
         { label: "Week 5-8", title: "Content & Reviews", tasks: ["Content kalender live: ma/wo/vr/za vaste posting", "Before & after machine: toestemmingsformulier + foto's", "Review-systeem: automatisch WhatsApp 4u na afspraak", "Lokale outreach: 5 ondernemers bezoeken met intro"] },
-        { label: "Week 9-12", title: "Eerste evaluatie + abonnement", tasks: ["Evalueren: boekingen per product, cost per lead", "Abonnement lanceren (Founding Members als eerste doelgroep)", "Meta Ad budget verhogen als CPL <\u20AC8", "Maand 3 target: \u20AC" + Math.round(t * 0.35).toLocaleString("nl-NL") + " bereikt"] },
+        { label: "Week 9-12", title: "Eerste evaluatie + abonnement", tasks: ["Evalueren: boekingen per product, cost per lead", "Abonnement lanceren (Founding Members als eerste doelgroep)", "Meta Ad budget verhogen als CPL <\u20AC8", "Maand 3 target: \u20AC" + Math.round(rev * 0.35).toLocaleString("nl-NL") + " bereikt"] },
       ],
       channels: [
         { name: "Google Business", icon: "search", budget: "\u20AC0", intensity: 100, active: true, note: "Prioriteit #1 \u2014 lokale SEO basis" },
@@ -152,13 +156,13 @@ function buildRoadmap(targetRevenue) {
         { label: "Google reviews", target: "15+", icon: "star" },
         { label: "Instagram followers", target: "200-500", icon: "trendUp" },
         { label: "Cost per lead (Meta)", target: "<\u20AC8", icon: "dollarSign" },
-        { label: "Omzet", target: "\u20AC" + Math.round(t * 0.35).toLocaleString("nl-NL"), icon: "barChart" },
+        { label: "Omzet", target: "\u20AC" + Math.round(rev * 0.35).toLocaleString("nl-NL"), icon: "barChart" },
       ],
     },
     {
       phase: 2, name: "Momentum", icon: "rocket",
-      timeline: "Maand 4-6", color: t.amber, colorKey: "amber",
-      revenueTarget: Math.round(t * 0.70),
+      timeline: "Maand 4-6", color: pal.amber, colorKey: "amber",
+      revenueTarget: Math.round(rev * 0.70),
       tagline: "Ads opschalen, abonnement groeit, systemen draaien automatisch",
       status: "upcoming",
       goals: [
@@ -171,7 +175,7 @@ function buildRoadmap(targetRevenue) {
       weeks: [
         { label: "Week 13-16", title: "Ads opschalen", tasks: ["Meta budget verhogen: \u20AC15/dag als CPL <\u20AC8", "A/B test: 2 creatives (before/after vs. video behandeling)", "Retargeting campagne: bezoekers zonder booking", "Aparte ad per product/Core Result met eigen angle"] },
         { label: "Week 17-20", title: "Google Ads + TikTok", tasks: ["Google Ads: \u20AC5-10/dag op zoekintentie keywords", "TikTok: raw video's van behandelingen/service", "Lookalike audiences op bestaande klanten (50+ leads nodig)", "Abonnement pitch verfijnen: besparing in euro's communiceren"] },
-        { label: "Week 21-24", title: "Systemen automatiseren", tasks: ["E-mail nieuwsbrief maandelijks: tip + deal + story", "Verjaardagscampagne: automatisch WhatsApp in geboortemaand", "Refer a friend: \u20AC20 korting per doorverwijzing activeren", "60-dagen heractivering: automatisch WhatsApp inactieve klanten"] },
+        { label: "Week 21-24", title: "Systemen automatiseren", tasks: ["E-mail nieuwsbrief maandelijks: tip + deal + story", "Verjaardagscampagne: automatisch WhatsApp in geboortemaand", "Refer-a-friend flow uitwerken (volle promotie start in fase 3)", "60-dagen heractivering: automatisch WhatsApp inactieve klanten"] },
       ],
       channels: [
         { name: "Google Business", icon: "search", budget: "\u20AC0", intensity: 100, active: true, note: "Actief houden, reviews blijven groeien" },
@@ -188,13 +192,13 @@ function buildRoadmap(targetRevenue) {
         { label: "Totale klanten", target: "80-120", icon: "users" },
         { label: "Google reviews", target: "30+", icon: "star" },
         { label: "MRR (abonnementen)", target: "\u20AC1.200-\u20AC3.700", icon: "activity" },
-        { label: "Omzet", target: "\u20AC" + Math.round(t * 0.70).toLocaleString("nl-NL"), icon: "barChart" },
+        { label: "Omzet", target: "\u20AC" + Math.round(rev * 0.70).toLocaleString("nl-NL"), icon: "barChart" },
       ],
     },
     {
       phase: 3, name: "Dominantie", icon: "crown",
-      timeline: "Maand 7-9", color: t.rose, colorKey: "rose",
-      revenueTarget: Math.round(t * 1.05),
+      timeline: "Maand 7-9", color: pal.rose, colorKey: "rose",
+      revenueTarget: Math.round(rev * 1.05),
       tagline: "Target bereikt, loyaliteitssysteem draait, lokale marktleider worden",
       status: "upcoming",
       goals: [
@@ -211,6 +215,7 @@ function buildRoadmap(targetRevenue) {
       ],
       channels: [
         { name: "Google Business", icon: "search", budget: "\u20AC0", intensity: 100, active: true, note: "50+ reviews target, domineer lokaal" },
+        { name: "Instagram Organisch", icon: "eye", budget: "\u20AC0", intensity: 88, active: true, note: "Organisch blijven bouwen naast paid" },
         { name: "Meta Ads", icon: "activity", budget: "\u20AC600-1.200/mnd", intensity: 90, active: true, note: "Video testimonials als beste creative" },
         { name: "Google Ads", icon: "search", budget: "\u20AC300-600/mnd", intensity: 80, active: true, note: "Schalen op best presterende keywords" },
         { name: "TikTok", icon: "hash", budget: "\u20AC0", intensity: 75, active: true, note: "Viral content strategie verfijnen" },
@@ -224,13 +229,13 @@ function buildRoadmap(targetRevenue) {
         { label: "High ticket sales", target: "3-8/kwartaal", icon: "award" },
         { label: "Google reviews", target: "50+", icon: "star" },
         { label: "MRR (abonnementen)", target: "\u20AC2.400-\u20AC7.500", icon: "activity" },
-        { label: "Omzet", target: "\u20AC" + Math.round(t * 1.05).toLocaleString("nl-NL"), icon: "rocket" },
+        { label: "Omzet", target: "\u20AC" + Math.round(rev * 1.05).toLocaleString("nl-NL"), icon: "rocket" },
       ],
     },
     {
       phase: 4, name: "Schaalslag", icon: "zap",
-      timeline: "Maand 10-12", color: t.gold, colorKey: "gold",
-      revenueTarget: Math.round(t * 1.40),
+      timeline: "Maand 10-12", color: pal.gold, colorKey: "gold",
+      revenueTarget: Math.round(rev * 1.40),
       tagline: "Peak season, team uitbreiden, jaar 2 plannen",
       status: "upcoming",
       goals: [
@@ -243,10 +248,11 @@ function buildRoadmap(targetRevenue) {
       weeks: [
         { label: "Week 37-40", title: "Q4 Voorbereiding", tasks: ["Black Friday campagne voorbereiden (2-3 weken vooruit)", "Cadeaubon campagne: Sinterklaas + Kerst positioneren", "Seizoensgebonden bundels maken met schaarste + datum", "Jaar 2 eerste doelstellingen formuleren"] },
         { label: "Week 41-44", title: "Peak Season", tasks: ["Black Friday deal uitvoeren: 48-72u schaarste", "Cadeaubon push via WhatsApp blast + Meta Ads", "B2B: jaar-end geschenken voor bedrijven actief promoten", "Capaciteit bewaken: geen overboeking"] },
-        { label: "Week 45-52", title: "Jaarafsluiting & Jaar 2", tasks: ["Kerst/Nieuwjaar campagne: 'Nieuw jaar, nieuwe start'", "Jaarreview: welke kanalen leverden beste ROI?", "Stoppen met wat niet werkt, verdubbelen op wat wel werkt", "Jaar 2 plan: nieuw target, uitbreiding, nieuw product?"] },
+        { label: "Week 45-48", title: "Jaarafsluiting & Jaar 2", tasks: ["Kerst/Nieuwjaar campagne: 'Nieuw jaar, nieuwe start'", "Jaarreview: welke kanalen leverden beste ROI?", "Stoppen met wat niet werkt, verdubbelen op wat wel werkt", "Jaar 2 plan: nieuw target, uitbreiding, nieuw product?"] },
       ],
       channels: [
         { name: "Meta Ads", icon: "activity", budget: "\u20AC900-2.000/mnd", intensity: 100, active: true, note: "Peak budget voor Black Friday + Kerst" },
+        { name: "Instagram Organisch", icon: "eye", budget: "\u20AC0", intensity: 82, active: true, note: "Peak content + UGC / testimonials" },
         { name: "Google Ads", icon: "search", budget: "\u20AC450-900/mnd", intensity: 90, active: true, note: "Seizoensgebonden keywords" },
         { name: "WhatsApp Business", icon: "radio", budget: "\u20AC0", intensity: 100, active: true, note: "Cadeaubon push + loyalty blast" },
         { name: "Email/Nieuwsbrief", icon: "fileText", budget: "\u20AC50/mnd", intensity: 85, active: true, note: "Kerst + jaarafsluiting campagnes" },
@@ -256,11 +262,11 @@ function buildRoadmap(targetRevenue) {
         { name: "Referral Programma", icon: "handshake", budget: "\u20AC20 pp", intensity: 70, active: true, note: "Kerst: dubbele referral bonus" },
       ],
       kpis: [
-        { label: "Record maandomzet (dec)", target: "\u20AC" + Math.round(t * 1.6).toLocaleString("nl-NL"), icon: "award" },
+        { label: "Record maandomzet (dec)", target: "\u20AC" + Math.round(rev * 1.6).toLocaleString("nl-NL"), icon: "award" },
         { label: "Cadeaubonnen verkocht", target: "30-60 stuks", icon: "gift" },
-        { label: "MRR einde jaar", target: "\u20AC" + Math.round(t * 0.45).toLocaleString("nl-NL"), icon: "activity" },
-        { label: "Totale jaaromzet", target: "\u20AC" + Math.round(t * 12 * 0.72).toLocaleString("nl-NL") + "+", icon: "dollarSign" },
-        { label: "Jaar 2 target/maand", target: "\u20AC" + Math.round(t * 1.5).toLocaleString("nl-NL"), icon: "rocket" },
+        { label: "MRR einde jaar", target: "\u20AC" + Math.round(rev * 0.45).toLocaleString("nl-NL"), icon: "activity" },
+        { label: "Totale jaaromzet", target: "\u20AC" + Math.round(rev * 12 * 0.72).toLocaleString("nl-NL") + "+", icon: "dollarSign" },
+        { label: "Jaar 2 target/maand", target: "\u20AC" + Math.round(rev * 1.5).toLocaleString("nl-NL"), icon: "rocket" },
       ],
     },
   ];
@@ -358,9 +364,9 @@ const CLIENTS = [
     id: "beauty", name: "Bloom Beauty Studio", type: "Schoonheidssalon",
     location: "Amsterdam", owner: "Sarah",
     products: "IPL Behandeling, Japanese Head Spa, Micro Needling, Massage",
-    audience: "Vrouwen 25-50, bewust bezig met huidverzorging en welzijn",
+    audience: "Vrouwen 25-50, bewust bezig met huidverzorging en welzijn \u2014 vaak overweldigd door keuze tussen behandelingen en het willen van een duidelijke route",
     targetRevenue: "10000", currentRevenue: "0", status: "Startend",
-    dreamGoal: "Altijd stralend, verzorgd en zelfverzekerd eruitzien \u2014 zonder stress of onverwachte kosten.",
+    dreamGoal: "Altijd stralend, verzorgd en zelfverzekerd eruitzien \u2014 met een helder, persoonlijk plan zodat je precies weet welke behandelingen en volgorde bij jouw huid en doelen passen, zonder giswerk.",
     modelName: "Glow Growth Methode\u2122", notes: "",
     colorKey: "rose", icon: "heart",
     frameworks: [
@@ -503,6 +509,7 @@ const CLIENTS = [
 
 const TABS = [
   { id: "profiel", label: "Profiel", icon: "user" },
+  { id: "ai-setup", label: "AI Klant-setup", icon: "sparkles" },
   { id: "resultaat", label: "Droomresultaat", icon: "target" },
   { id: "matrix", label: "Value Matrix", icon: "grid" },
   { id: "roadmap", label: "Roadmap", icon: "calendar" },
@@ -619,11 +626,14 @@ export default function ClientSystem() {
   const [copied, setCopied] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [theme, setTheme] = useState("dark");
+  const [aiBrief, setAiBrief] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState(null);
 
   const t = THEMES[theme];
   const client = clients.find(c => c.id === activeId) || clients[0];
   const clientColor = getColor(client.colorKey, theme);
-  const roadmap = buildRoadmap(client.targetRevenue);
+  const roadmap = buildRoadmap(client.targetRevenue, theme);
 
   function updClient(key, val) {
     setClients(prev => prev.map(c => c.id === activeId ? { ...c, [key]: val } : c));
@@ -634,6 +644,30 @@ export default function ClientSystem() {
     setClients(prev => [...prev, nc]);
     setActiveId(nc.id);
     setTab("profiel");
+  }
+
+  async function runAiOnboard() {
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const r = await fetch(`${API_BASE}/api/onboard-client`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brief: aiBrief }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.error || data.detail || `API ${r.status}`);
+      const c = data.client;
+      if (!c || !c.id) throw new Error("Antwoord bevat geen client");
+      setClients(prev => [...prev, c]);
+      setActiveId(c.id);
+      setAiBrief("");
+      setTab("profiel");
+    } catch (e) {
+      setAiError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setAiLoading(false);
+    }
   }
 
   const activeFw = fwView ? client.frameworks.find(f => f.id === fwView.frameworkId) : null;
@@ -877,6 +911,44 @@ Schrijf in het Nederlands. Concreet, direct toepasbaar.`;
                 <Field t={t} label="Framework Naam" value={client.modelName} onChange={v => updClient("modelName", v)} />
                 <Field t={t} label="Meest Gewenste Droomdoel (klantperspectief)" value={client.dreamGoal} onChange={v => updClient("dreamGoal", v)} multi />
                 <Field t={t} label="Notities" value={client.notes} onChange={v => updClient("notes", v)} multi />
+              </Card>
+            </div>
+          )}
+
+          {/* ══ AI KLANT-SETUP ══ */}
+          {tab === "ai-setup" && (
+            <div>
+              <SectionLabel t={t}>Claude API &mdash; nieuwe klant uit briefing</SectionLabel>
+              <p style={{ color: t.textSecondary, fontSize: 14, lineHeight: 1.6, margin: "0 0 20px" }}>
+                Vul een korte briefing in (bedrijfsnaam, aanbod, doelgroep, locatie, omzetdoel). Draai lokaal <code style={{ fontSize: 12, color: t.accentLight }}>npm run dev:all</code> en zet <code style={{ fontSize: 12, color: t.accentLight }}>ANTHROPIC_API_KEY</code> in <code style={{ fontSize: 12, color: t.accentLight }}>.env</code>. De methodologie (droomresultaat, 5 Core Results, Value Ladder, micro-frameworks) staat op de server.
+              </p>
+              <Card t={t} style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", color: t.textSecondary, fontSize: 12, fontWeight: 500, marginBottom: 8 }}>Briefing</label>
+                <textarea
+                  value={aiBrief}
+                  onChange={e => setAiBrief(e.target.value)}
+                  placeholder="Bv. Studio X in Rotterdam, brow lifts en PMU, vrouwen 30-55, target 12k/maand..."
+                  style={{
+                    width: "100%", minHeight: 180, boxSizing: "border-box",
+                    background: t.bgSub, border: `1px solid ${t.border}`, borderRadius: t.radiusSm,
+                    padding: "12px 14px", color: t.text, fontSize: 14, fontFamily: t.fontBase, lineHeight: 1.5, resize: "vertical",
+                  }}
+                />
+                {aiError && (
+                  <p style={{ color: t.rose, fontSize: 13, margin: "12px 0 0" }}>{aiError}</p>
+                )}
+                <button type="button" disabled={aiLoading || aiBrief.trim().length < 20}
+                  onClick={runAiOnboard}
+                  style={{
+                    marginTop: 16, display: "inline-flex", alignItems: "center", gap: 8,
+                    background: aiLoading || aiBrief.trim().length < 20 ? t.border : t.accent,
+                    border: "none", borderRadius: t.radiusSm, color: "#fff", padding: "12px 22px",
+                    cursor: aiLoading || aiBrief.trim().length < 20 ? "not-allowed" : "pointer",
+                    fontSize: 14, fontWeight: 600, fontFamily: t.fontBase,
+                  }}>
+                  <Icon name="sparkles" size={16} color="#fff" />
+                  {aiLoading ? "Bezig..." : "Genereer klant met AI"}
+                </button>
               </Card>
             </div>
           )}
