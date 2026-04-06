@@ -22,24 +22,24 @@ git push origin master
 
 | Situatie | Waar |
 |----------|------|
-| **Lokaal** | Bestand `.env` in de projectmap: `ANTHROPIC_API_KEY=sk-ant-...` |
-| **GitHub (alleen de repo)** | Nergens in code of commits. Optioneel: **Repo → Settings → Secrets and variables → Actions** als een workflow de key nodig heeft (bijv. geautomatiseerde deploy). |
-| **Productie (API draait op Railway, Render, Fly.io, VPS, …)** | In het **Environment / Variables**-scherm van die hosting: `ANTHROPIC_API_KEY` (en optioneel `ANTHROPIC_MODEL`, `PORT`). |
+| **Lokaal** | Bestand `.env`: `ANTHROPIC_API_KEY=sk-ant-...` |
+| **Vercel (deze repo)** | [Vercel Dashboard](https://vercel.com) → jouw project → **Settings** → **Environment Variables** → voeg toe: `ANTHROPIC_API_KEY` (Production + Preview als je previews wilt testen). Optioneel: `ANTHROPIC_MODEL`. Daarna **nieuwe deploy** (Redeploy). Gebruik **nooit** de prefix `VITE_` voor de Anthropic-key (dan zou hij in de browser belanden). |
+| **GitHub Actions** | Alleen als een workflow de key nodig heeft: **Repo → Settings → Secrets and variables → Actions**. |
 
-De frontend (statische build) heeft **geen** Anthropic-key nodig; alleen de Node-server op je hosting.
+De **frontend-build** heeft geen Anthropic-key nodig. Alleen de **serverless API** (`api/index.js` → `server/app.js`) leest `ANTHROPIC_API_KEY`.
 
-## Productie: frontend + API gescheiden
+## Vercel-deploy (één project: site + API)
 
-1. Deploy **`server/`** als Node-service en zet daar `ANTHROPIC_API_KEY`.
-2. Bouw de frontend met de publieke API-URL:
+- Dit project gebruikt **Vite** (`dist/`) en **`api/index.js`** (Express onder `/api`).
+- Endpoints: `POST /api/onboard-client`, `GET /api/health`.
+- Zelfde domein als je app: je hoeft **`VITE_API_BASE_URL` niet te zetten** (leeg = relatieve URLs).
+- Zet alleen **`ANTHROPIC_API_KEY`** in Vercel Environment Variables.
 
-   ```bash
-   set VITE_API_BASE_URL=https://jouw-api-voorbeeld.up.railway.app
-   npm run build
-   ```
+## Aparte API-host (optioneel)
 
-   (Op macOS/Linux: `export VITE_API_BASE_URL=...`)
+Als de API ergens anders draait, bouw met `VITE_API_BASE_URL=https://jouw-backend...`:
 
-3. Upload `dist/` naar GitHub Pages, Vercel, Netlify, etc.
-
-Zorg dat je API CORS toelaat voor je frontend-domein (nu staat `origin: true` open; voor productie kun je dit strakker zetten in `server/index.js`).
+```bash
+set VITE_API_BASE_URL=https://jouw-api.voorbeeld.nl
+npm run build
+```
