@@ -1147,7 +1147,10 @@ Schrijf in het Nederlands. Concreet, direct toepasbaar.`;
               <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${t.border}` }}>
                 <p style={{ color: t.textMuted, fontSize: 11, margin: "0 0 8px", lineHeight: 1.45, fontWeight: 600 }}>Cloud sync (andere browser / PC)</p>
                 <p style={{ color: t.textDim, fontSize: 10, margin: "0 0 8px", lineHeight: 1.45 }}>
-                  Lokaal = alleen deze browser. Cloud: Vercel <code style={{ fontSize: 10 }}>SYNC_SECRET</code> + <strong>Supabase</strong> (<code style={{ fontSize: 10 }}>SUPABASE_URL</code> + service role) of KV/Redis — zie README. Hier hetzelfde wachtwoord als <code style={{ fontSize: 10 }}>SYNC_SECRET</code>, dan Opslaan.
+                  <strong style={{ color: t.textSecondary }}>Beveiliging:</strong> het echte <code style={{ fontSize: 10 }}>SYNC_SECRET</code> staat alleen in Vercel (server), niet in de website-code. Wat je hier typt wordt in <strong>deze browser</strong> bewaard (localStorage) om naar <code style={{ fontSize: 10 }}>/api</code> te sturen over HTTPS — niet in de zichtbare broncode van de pagina.
+                </p>
+                <p style={{ color: t.textDim, fontSize: 10, margin: "0 0 8px", lineHeight: 1.45 }}>
+                  <strong style={{ color: t.textSecondary }}>Incognito / andere browser:</strong> daar is localStorage leeg. Vul <strong>opnieuw</strong> hetzelfde wachtwoord als <code style={{ fontSize: 10 }}>SYNC_SECRET</code> in en klik <strong>Opslaan token</strong> — anders laadt de app geen cloud-data (je ziet dan alleen de voorbeeldklanten).
                 </p>
                 <input
                   type="password"
@@ -1179,6 +1182,11 @@ Schrijf in het Nederlands. Concreet, direct toepasbaar.`;
                     Wis
                   </button>
                 </div>
+                {!syncToken && (
+                  <p style={{ color: t.amber, fontSize: 10, margin: "8px 0 0", lineHeight: 1.45 }}>
+                    Geen token in deze sessie: cloud-data wordt niet geladen tot je hierboven opslaat.
+                  </p>
+                )}
                 {syncToken && (
                   <p style={{ color: cloudSyncError ? t.rose : t.green, fontSize: 10, margin: "8px 0 0", lineHeight: 1.4 }}>
                     {cloudSyncError || (cloudReady ? "Cloud sync actief — wijzigingen worden gesynchroniseerd." : "Laden…")}
