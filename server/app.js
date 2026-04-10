@@ -2,7 +2,15 @@ import express from "express";
 import cors from "cors";
 import Anthropic from "@anthropic-ai/sdk";
 import { ONBOARD_SYSTEM } from "./methodology.js";
-import { backendConfigured, readAppState, writeAppState } from "./appStateStorage.js";
+import {
+  backendConfigured,
+  readAppState,
+  writeAppState,
+  resolveSupabaseUrl,
+  resolveSupabaseUrlSource,
+  resolveServiceRoleKey,
+  resolveServiceRoleKeySource,
+} from "./appStateStorage.js";
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
@@ -122,11 +130,14 @@ apiRouter.get("/health", (_req, res) => {
   const checks = {
     SYNC_SECRET: s("SYNC_SECRET"),
     SUPABASE_URL: s("SUPABASE_URL"),
+    NEXT_PUBLIC_SUPABASE_URL: s("NEXT_PUBLIC_SUPABASE_URL"),
     SUPABASE_SERVICE_ROLE_KEY: s("SUPABASE_SERVICE_ROLE_KEY"),
     KV_REST_API_URL: s("KV_REST_API_URL"),
     KV_REST_API_TOKEN: s("KV_REST_API_TOKEN"),
   };
-  const supabaseOk = checks.SUPABASE_URL && checks.SUPABASE_SERVICE_ROLE_KEY;
+  const urlResolved = Boolean(resolveSupabaseUrl());
+  const roleResolved = Boolean(resolveServiceRoleKey());
+  const supabaseOk = urlResolved && roleResolved;
   const kvOk = checks.KV_REST_API_URL && checks.KV_REST_API_TOKEN;
   res.json({
     ok: true,
@@ -134,11 +145,16 @@ apiRouter.get("/health", (_req, res) => {
     vercelEnv: process.env.VERCEL_ENV || null,
     cloudSync: Boolean(checks.SYNC_SECRET && backendConfigured()),
     storage: supabaseOk ? "supabase" : kvOk ? "kv" : "none",
-    /** Welke env-vars de server wél ziet (geen waarden). Als alles false: variabelen staan niet op Vercel of redeploy nodig. */
     checks,
+    /** Welke env-naam gebruikt wordt (na fallbacks). Geen waarden. */
+    supabase: {
+      urlFromEnv: resolveSupabaseUrlSource(),
+      serviceKeyFromEnv: resolveServiceRoleKeySource(),
+      urlOk: urlResolved,
+    },
     hint:
       !checks.SYNC_SECRET || !supabaseOk
-        ? "Zet in Vercel → Settings → Environment Variables (Production): SYNC_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY. Namen exact. Daarna Redeploy."
+        ? "Vercel Production: SYNC_SECRET + project-URL (SUPABASE_URL of NEXT_PUBLIC_SUPABASE_URL) + SUPABASE_SERVICE_ROLE_KEY. Lege waarde = ongeldig. Redeploy na wijzigingen."
         : null,
   });
 });

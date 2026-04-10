@@ -3,8 +3,45 @@ import { createClient } from "@supabase/supabase-js";
 
 const APP_STATE_KV_KEY = "mt-marketing-app-state";
 
+/** Project-URL: sommige setups zetten alleen NEXT_PUBLIC_SUPABASE_URL (zelfde URL, niet geheim). */
+const SUPABASE_URL_KEYS = ["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL", "PUBLIC_SUPABASE_URL"];
+
+const SERVICE_KEY_KEYS = ["SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_SERVICE_KEY"];
+
+export function resolveSupabaseUrl() {
+  for (const k of SUPABASE_URL_KEYS) {
+    const v = process.env[k];
+    if (typeof v === "string" && v.trim()) return v.trim().replace(/\/$/, "");
+  }
+  return "";
+}
+
+export function resolveSupabaseUrlSource() {
+  for (const k of SUPABASE_URL_KEYS) {
+    const v = process.env[k];
+    if (typeof v === "string" && v.trim()) return k;
+  }
+  return null;
+}
+
+export function resolveServiceRoleKey() {
+  for (const k of SERVICE_KEY_KEYS) {
+    const v = process.env[k];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return "";
+}
+
+export function resolveServiceRoleKeySource() {
+  for (const k of SERVICE_KEY_KEYS) {
+    const v = process.env[k];
+    if (typeof v === "string" && v.trim()) return k;
+  }
+  return null;
+}
+
 export function supabaseConfigured() {
-  return Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+  return Boolean(resolveSupabaseUrl() && resolveServiceRoleKey());
 }
 
 export function kvConfigured() {
@@ -21,7 +58,7 @@ let supabaseSingleton = null;
 function getSupabase() {
   if (!supabaseConfigured()) return null;
   if (!supabaseSingleton) {
-    supabaseSingleton = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+    supabaseSingleton = createClient(resolveSupabaseUrl(), resolveServiceRoleKey(), {
       auth: { persistSession: false, autoRefreshToken: false },
     });
   }
