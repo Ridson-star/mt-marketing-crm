@@ -511,6 +511,15 @@ const CLIENTS = [
 const STORAGE_CLIENTS_KEY = "mt-marketing-clients-v1";
 const STORAGE_ACTIVE_ID_KEY = "mt-marketing-active-client-id";
 const STORAGE_THEME_KEY = "mt-marketing-theme";
+const STORAGE_SYNC_TOKEN_KEY = "mt-marketing-sync-token";
+
+function loadSyncToken() {
+  try {
+    return localStorage.getItem(STORAGE_SYNC_TOKEN_KEY) || "";
+  } catch {
+    return "";
+  }
+}
 
 function loadStoredClients() {
   try {
@@ -728,6 +737,10 @@ export default function ClientSystem() {
   const [aiError, setAiError] = useState(null);
   const importFileRef = useRef(null);
   const importModeRef = useRef("replace");
+  const [syncToken, setSyncToken] = useState(loadSyncToken);
+  const [syncTokenDraft, setSyncTokenDraft] = useState(loadSyncToken);
+  const [cloudReady, setCloudReady] = useState(() => !loadSyncToken());
+  const [cloudSyncError, setCloudSyncError] = useState(null);
 
   useEffect(() => {
     try {
@@ -748,6 +761,97 @@ export default function ClientSystem() {
       localStorage.setItem(STORAGE_THEME_KEY, theme);
     } catch { /* ignore */ }
   }, [theme]);
+
+  /** Eénmalig laden van server bij ingestelde sync-token; lege server = eerste upload van huidige lokale data. */
+  useEffect(() => {
+    if (!syncToken) {
+      setCloudReady(true);
+      setCloudSyncError(null);
+      return;
+    }
+    let cancelled = false;
+    setCloudReady(false);
+    (async () => {
+      try {
+        const r = await fetch(`${API_BASE}/api/app-state`, {
+          headers: { Authorization: `Bearer ${syncToken}` },
+        });
+        const data = await r.json().catch(() => ({}));
+        if (cancelled) return;
+        if (!r.ok) {
+          setCloudSyncError(typeof data.error === "string" ? data.error : `Cloud sync (${r.status})`);
+          setCloudReady(true);
+          return;
+        }
+        setCloudSyncError(null);
+        if (Array.isArray(data.clients) && data.clients.length > 0) {
+          setClients(data.clients);
+          if (data.activeId && data.clients.some(c => c.id === data.activeId)) {
+            setActiveId(data.activeId);
+          }
+        } else {
+          const put = await fetch(`${API_BASE}/api/app-state`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${syncToken}` },
+            body: JSON.stringify({ clients, activeId }),
+          });
+          const putData = await put.json().catch(() => ({}));
+          if (!put.ok) {
+            setCloudSyncError(typeof putData.error === "string" ? putData.error : `Upload (${put.status})`);
+          }
+        }
+      } catch (e) {
+        if (!cancelled) setCloudSyncError(e instanceof Error ? e.message : String(e));
+      } finally {
+        if (!cancelled) setCloudReady(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [syncToken]);
+
+  /** Debounced cloud-save na wijzigingen (alleen met sync-token en na eerste pull). */
+  useEffect(() => {
+    if (!syncToken || !cloudReady) return;
+    const tid = setTimeout(async () => {
+      try {
+        const r = await fetch(`${API_BASE}/api/app-state`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${syncToken}` },
+          body: JSON.stringify({ clients, activeId }),
+        });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) {
+          setCloudSyncError(typeof data.error === "string" ? data.error : `Opslaan (${r.status})`);
+        } else {
+          setCloudSyncError(null);
+        }
+      } catch (e) {
+        setCloudSyncError(e instanceof Error ? e.message : String(e));
+      }
+    }, 900);
+    return () => clearTimeout(tid);
+  }, [clients, activeId, syncToken, cloudReady]);
+
+  function saveSyncToken() {
+    const t = syncTokenDraft.trim();
+    try {
+      if (t) localStorage.setItem(STORAGE_SYNC_TOKEN_KEY, t);
+      else localStorage.removeItem(STORAGE_SYNC_TOKEN_KEY);
+    } catch { /* ignore */ }
+    setSyncToken(t);
+  }
+
+  function clearSyncToken() {
+    try {
+      localStorage.removeItem(STORAGE_SYNC_TOKEN_KEY);
+    } catch { /* ignore */ }
+    setSyncToken("");
+    setSyncTokenDraft("");
+    setCloudSyncError(null);
+    setCloudReady(true);
+  }
 
   const t = THEMES[theme];
   const client = clients.find(c => c.id === activeId) || clients[0];
@@ -1039,9 +1143,52 @@ Schrijf in het Nederlands. Concreet, direct toepasbaar.`;
             </button>
           </div>
           {!sidebarCollapsed && (
-            <p style={{ color: t.textDim, fontSize: 10, margin: "8px 4px 0", lineHeight: 1.45 }}>
-              Automatisch opgeslagen in deze browser. Exporteer vóór je wist site-data of van computer wisselt.
-            </p>
+            <>
+              <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${t.border}` }}>
+                <p style={{ color: t.textMuted, fontSize: 11, margin: "0 0 8px", lineHeight: 1.45, fontWeight: 600 }}>Cloud sync (andere browser / PC)</p>
+                <p style={{ color: t.textDim, fontSize: 10, margin: "0 0 8px", lineHeight: 1.45 }}>
+                  Lokaal = alleen deze browser. Voor dezelfde data overal: zet in Vercel <code style={{ fontSize: 10 }}>SYNC_SECRET</code> + koppel KV/Redis, vul hier exact hetzelfde wachtwoord en klik Opslaan.
+                </p>
+                <input
+                  type="password"
+                  value={syncTokenDraft}
+                  onChange={e => setSyncTokenDraft(e.target.value)}
+                  placeholder="Zelfde als SYNC_SECRET op server"
+                  autoComplete="off"
+                  style={{
+                    width: "100%", boxSizing: "border-box",
+                    background: t.bgSub, border: `1px solid ${t.border}`, borderRadius: t.radiusSm,
+                    padding: "8px 10px", color: t.text, fontSize: 12, fontFamily: t.fontBase, marginBottom: 6,
+                  }}
+                />
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  <button type="button" onClick={saveSyncToken}
+                    style={{
+                      flex: 1, minWidth: 80, background: t.accentDim, border: `1px solid ${t.borderAccent}`,
+                      borderRadius: t.radiusSm, padding: "6px 10px", cursor: "pointer", color: t.accentLight,
+                      fontSize: 12, fontWeight: 600, fontFamily: t.fontBase,
+                    }}>
+                    Opslaan token
+                  </button>
+                  <button type="button" onClick={clearSyncToken}
+                    style={{
+                      background: t.surface2, border: `1px solid ${t.border}`,
+                      borderRadius: t.radiusSm, padding: "6px 10px", cursor: "pointer", color: t.textMuted,
+                      fontSize: 12, fontFamily: t.fontBase,
+                    }}>
+                    Wis
+                  </button>
+                </div>
+                {syncToken && (
+                  <p style={{ color: cloudSyncError ? t.rose : t.green, fontSize: 10, margin: "8px 0 0", lineHeight: 1.4 }}>
+                    {cloudSyncError || (cloudReady ? "Cloud sync actief — wijzigingen worden gesynchroniseerd." : "Laden…")}
+                  </p>
+                )}
+              </div>
+              <p style={{ color: t.textDim, fontSize: 10, margin: "10px 4px 0", lineHeight: 1.45 }}>
+                Zonder cloud: alleen opgeslagen in deze browser. Gebruik export of zet cloud sync.
+              </p>
+            </>
           )}
         </div>
 

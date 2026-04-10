@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import Anthropic from "@anthropic-ai/sdk";
+import { kv } from "@vercel/kv";
 import { ONBOARD_SYSTEM } from "./methodology.js";
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
@@ -97,12 +98,73 @@ function normalizeClient(parsed) {
  */
 const app = express();
 app.use(cors({ origin: true }));
-app.use(express.json({ limit: "512kb" }));
+app.use(express.json({ limit: "2mb" }));
+
+const APP_STATE_KV_KEY = "mt-marketing-app-state";
+
+function kvConfigured() {
+  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
+
+function requireSyncAuth(req, res, next) {
+  const secret = process.env.SYNC_SECRET;
+  if (!secret) {
+    return res.status(503).json({
+      error: "SYNC_SECRET ontbreekt. Zet SYNC_SECRET in Vercel (Environment Variables) en koppel Vercel KV / Redis.",
+    });
+  }
+  const auth = req.headers.authorization || "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  if (token !== secret) {
+    return res.status(401).json({ error: "Ongeldige sync-token (moet gelijk zijn aan SYNC_SECRET op de server)." });
+  }
+  next();
+}
 
 const apiRouter = express.Router();
 
 apiRouter.get("/health", (_req, res) => {
-  res.json({ ok: true, model: MODEL });
+  res.json({
+    ok: true,
+    model: MODEL,
+    cloudSync: Boolean(process.env.SYNC_SECRET && kvConfigured()),
+  });
+});
+
+apiRouter.get("/app-state", requireSyncAuth, async (_req, res) => {
+  if (!kvConfigured()) {
+    return res.status(503).json({
+      error: "Vercel KV / Redis niet gekoppeld (KV_REST_API_URL / KV_REST_API_TOKEN ontbreken).",
+    });
+  }
+  try {
+    const data = await kv.get(APP_STATE_KV_KEY);
+    if (data == null) {
+      return res.json({ clients: null, activeId: null });
+    }
+    return res.json(data);
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
+  }
+});
+
+apiRouter.put("/app-state", requireSyncAuth, async (req, res) => {
+  if (!kvConfigured()) {
+    return res.status(503).json({ error: "Vercel KV / Redis niet gekoppeld." });
+  }
+  const body = req.body;
+  if (!body || !Array.isArray(body.clients) || !body.clients.every((c) => c && typeof c.id === "string")) {
+    return res.status(400).json({ error: "Verwacht { clients: [...], activeId?: string }" });
+  }
+  const activeId = typeof body.activeId === "string" ? body.activeId : body.clients[0]?.id ?? "";
+  try {
+    await kv.set(APP_STATE_KV_KEY, { clients: body.clients, activeId });
+    return res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
+  }
 });
 
 apiRouter.post("/onboard-client", async (req, res) => {

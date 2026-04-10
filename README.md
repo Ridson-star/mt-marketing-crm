@@ -35,6 +35,12 @@ De **frontend-build** heeft geen Anthropic-key nodig. Alleen de **serverless API
 - Zelfde domein als je app: je hoeft **`VITE_API_BASE_URL` niet te zetten** (leeg = relatieve URLs).
 - Zet alleen **`ANTHROPIC_API_KEY`** in Vercel Environment Variables.
 
+## Data: browser vs cloud
+
+- **Alleen localStorage:** ingevoerde klanten worden standaard **per browser** opgeslagen (Chrome ≠ Firefox ≠ telefoon). Dezelfde URL kopieert **geen** data mee — dat is normaal.
+- **Cloud sync (optioneel):** koppel in Vercel **Storage → Redis / KV** (of bestaande KV) aan het project zodat `KV_REST_API_URL` en `KV_REST_API_TOKEN` in Environment Variables staan. Voeg **`SYNC_SECRET`** toe (een lang, willekeurig wachtwoord). Deploy opnieuw. In de app, onder **Gegevens → Cloud sync**, vul **exact hetzelfde** wachtwoord als `SYNC_SECRET` en klik **Opslaan token**. Daarna worden wijzigingen naar de server geschreven en laadt elke andere browser dezelfde data (na hetzelfde token).
+- Zonder cloud blijft **Export backup (.json)** handig om handmatig te verplaatsen.
+
 ## Aparte API-host (optioneel)
 
 Als de API ergens anders draait, bouw met `VITE_API_BASE_URL=https://jouw-backend...`:
