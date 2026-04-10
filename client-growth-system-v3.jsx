@@ -1016,7 +1016,9 @@ Schrijf in het Nederlands. Concreet, direct toepasbaar.`;
         width: sidebarCollapsed ? 64 : 260, minWidth: sidebarCollapsed ? 64 : 260,
         background: t.surface, borderRight: `1px solid ${t.border}`,
         display: "flex", flexDirection: "column", transition: "all 0.25s ease",
-        height: "100vh", position: "sticky", top: 0, overflow: "hidden",
+        height: "100vh", maxHeight: "100vh", position: "sticky", top: 0,
+        overflowX: "hidden", overflowY: "auto",
+        WebkitOverflowScrolling: "touch",
       }}>
         {/* Brand */}
         <div style={{ padding: sidebarCollapsed ? "20px 12px" : "20px 20px", borderBottom: `1px solid ${t.border}`, display: "flex", alignItems: "center", gap: 12, minHeight: 64 }}>
@@ -1073,8 +1075,8 @@ Schrijf in het Nederlands. Concreet, direct toepasbaar.`;
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav style={{ padding: sidebarCollapsed ? "12px 8px" : "16px 12px", flex: 1 }}>
+        {/* Navigation — geen flex:1: anders wordt onderkant (Gegevens / cloud sync) buiten beeld gedrukt op korte viewports */}
+        <nav style={{ padding: sidebarCollapsed ? "12px 8px" : "16px 12px", flexShrink: 0 }}>
           {!sidebarCollapsed && <SectionLabel t={t} style={{ margin: "0 0 10px", paddingLeft: 8 }}>Navigatie</SectionLabel>}
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {TABS.map(tb => {
@@ -1147,10 +1149,7 @@ Schrijf in het Nederlands. Concreet, direct toepasbaar.`;
               <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${t.border}` }}>
                 <p style={{ color: t.textMuted, fontSize: 11, margin: "0 0 8px", lineHeight: 1.45, fontWeight: 600 }}>Cloud sync (andere browser / PC)</p>
                 <p style={{ color: t.textDim, fontSize: 10, margin: "0 0 8px", lineHeight: 1.45 }}>
-                  <strong style={{ color: t.textSecondary }}>Beveiliging:</strong> het echte <code style={{ fontSize: 10 }}>SYNC_SECRET</code> staat alleen in Vercel (server), niet in de website-code. Wat je hier typt wordt in <strong>deze browser</strong> bewaard (localStorage) om naar <code style={{ fontSize: 10 }}>/api</code> te sturen over HTTPS — niet in de zichtbare broncode van de pagina.
-                </p>
-                <p style={{ color: t.textDim, fontSize: 10, margin: "0 0 8px", lineHeight: 1.45 }}>
-                  <strong style={{ color: t.textSecondary }}>Incognito / andere browser:</strong> daar is localStorage leeg. Vul <strong>opnieuw</strong> hetzelfde wachtwoord als <code style={{ fontSize: 10 }}>SYNC_SECRET</code> in en klik <strong>Opslaan token</strong> — anders laadt de app geen cloud-data (je ziet dan alleen de voorbeeldklanten).
+                  <strong style={{ color: t.textSecondary }}>Token:</strong> server-secret staat in Vercel; hier alleen voor deze browser (localStorage, HTTPS naar /api). Incognito/andere browser: opnieuw invullen + Opslaan.
                 </p>
                 <input
                   type="password"
