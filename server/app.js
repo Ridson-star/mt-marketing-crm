@@ -118,11 +118,28 @@ function requireSyncAuth(req, res, next) {
 const apiRouter = express.Router();
 
 apiRouter.get("/health", (_req, res) => {
+  const s = (k) => Boolean(process.env[k] && String(process.env[k]).trim());
+  const checks = {
+    SYNC_SECRET: s("SYNC_SECRET"),
+    SUPABASE_URL: s("SUPABASE_URL"),
+    SUPABASE_SERVICE_ROLE_KEY: s("SUPABASE_SERVICE_ROLE_KEY"),
+    KV_REST_API_URL: s("KV_REST_API_URL"),
+    KV_REST_API_TOKEN: s("KV_REST_API_TOKEN"),
+  };
+  const supabaseOk = checks.SUPABASE_URL && checks.SUPABASE_SERVICE_ROLE_KEY;
+  const kvOk = checks.KV_REST_API_URL && checks.KV_REST_API_TOKEN;
   res.json({
     ok: true,
     model: MODEL,
-    cloudSync: Boolean(process.env.SYNC_SECRET && backendConfigured()),
-    storage: process.env.SUPABASE_URL ? "supabase" : process.env.KV_REST_API_URL ? "kv" : "none",
+    vercelEnv: process.env.VERCEL_ENV || null,
+    cloudSync: Boolean(checks.SYNC_SECRET && backendConfigured()),
+    storage: supabaseOk ? "supabase" : kvOk ? "kv" : "none",
+    /** Welke env-vars de server wél ziet (geen waarden). Als alles false: variabelen staan niet op Vercel of redeploy nodig. */
+    checks,
+    hint:
+      !checks.SYNC_SECRET || !supabaseOk
+        ? "Zet in Vercel → Settings → Environment Variables (Production): SYNC_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY. Namen exact. Daarna Redeploy."
+        : null,
   });
 });
 
