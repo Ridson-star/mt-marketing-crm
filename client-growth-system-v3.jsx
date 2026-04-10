@@ -109,6 +109,7 @@ function Icon({ name, size = 18, color = "currentColor", style: s }) {
     heart: <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>,
     package: <><line x1="16.5" x2="7.5" y1="9.4" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" x2="12" y1="22.08" y2="12"/></>,
     handshake: <><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></>,
+    compass: <><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></>,
   };
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, ...s }}>
@@ -507,14 +508,109 @@ const CLIENTS = [
   },
 ];
 
+const STORAGE_CLIENTS_KEY = "mt-marketing-clients-v1";
+const STORAGE_ACTIVE_ID_KEY = "mt-marketing-active-client-id";
+const STORAGE_THEME_KEY = "mt-marketing-theme";
+
+function loadStoredClients() {
+  try {
+    const raw = localStorage.getItem(STORAGE_CLIENTS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) return null;
+    if (!parsed.every(c => c && typeof c.id === "string")) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function loadStoredActiveId() {
+  try {
+    const raw = localStorage.getItem(STORAGE_ACTIVE_ID_KEY);
+    return typeof raw === "string" && raw.length ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
+function loadStoredTheme() {
+  try {
+    const raw = localStorage.getItem(STORAGE_THEME_KEY);
+    if (raw === "light" || raw === "dark") return raw;
+  } catch { /* ignore */ }
+  return "dark";
+}
+
+function getInitialClientsAndActiveId() {
+  const stored = loadStoredClients();
+  const aid = loadStoredActiveId();
+  if (stored && aid && stored.some(c => c.id === aid)) {
+    return { clients: stored, activeId: aid };
+  }
+  if (stored) {
+    return { clients: stored, activeId: stored[0].id };
+  }
+  return { clients: CLIENTS, activeId: "auto" };
+}
+
+function mergeClientsById(existing, incoming) {
+  const map = new Map(existing.map(c => [c.id, c]));
+  for (const c of incoming) {
+    map.set(c.id, c);
+  }
+  return Array.from(map.values());
+}
+
 const TABS = [
   { id: "profiel", label: "Profiel", icon: "user" },
   { id: "ai-setup", label: "AI Klant-setup", icon: "sparkles" },
   { id: "resultaat", label: "Droomresultaat", icon: "target" },
   { id: "matrix", label: "Value Matrix", icon: "grid" },
+  { id: "drivers", label: "Primary Drivers", icon: "compass" },
   { id: "roadmap", label: "Roadmap", icon: "calendar" },
   { id: "funnel", label: "Funnel Map", icon: "map" },
   { id: "prompt", label: "Master Prompt", icon: "fileText" },
+];
+
+/** Primary drivers: diepe motieven achter koopgedrag — elk valt onder één van drie hoofdcategorieën. */
+const PRIMARY_DRIVER_CATEGORIES = {
+  financieel: {
+    label: "Financieel",
+    short: "Geld, zekerheid, groei",
+    icon: "dollarSign",
+    color: (th) => th.green,
+    dim: (th) => th.greenDim,
+    intro: "Alles rond inkomen, vermogen, risico en materiële vrijheid: waar mensen voor werken, sparen en investeren.",
+  },
+  relatie: {
+    label: "Relatie",
+    short: "Verbinding & erkenning",
+    icon: "heart",
+    color: (th) => th.rose,
+    dim: (th) => th.roseDim,
+    intro: "Sociale en emotionele drivers: erbij horen, gezien worden, liefde, familie, reputatie en status bij anderen.",
+  },
+  gezondheid: {
+    label: "Gezondheid",
+    short: "Welzijn & vitaliteit",
+    icon: "activity",
+    color: (th) => th.cyan,
+    dim: (th) => th.cyanDim,
+    intro: "Lichamelijk en mentaal welzijn: energie, levensduur, herstel, rust en het vermijden van pijn of ziekte.",
+  },
+};
+
+const PRIMARY_DRIVERS = [
+  { name: "Zekerheid & voorspelbaarheid", category: "financieel", description: "Stabiel inkomen, buffer en controle; angst voor financiële onzekerheid wegnemen." },
+  { name: "Vrijheid & autonomie", category: "financieel", description: "Zelf kunnen beslissen, minder afhankelijk zijn van één baan of opdrachtgever." },
+  { name: "Groei & status (materieel)", category: "financieel", description: "Meer verdienen, opschalen, 'er komen' — vaak zichtbaar in auto, huis of lifestyle." },
+  { name: "Erkenning & waardering", category: "relatie", description: "Gezien worden door partner, team of markt; respect en bevestiging." },
+  { name: "Verbinding & liefde", category: "relatie", description: "Nabijheid, vertrouwen en emotionele veiligheid in relaties." },
+  { name: "Sociale status & prestige", category: "relatie", description: "Horen bij een groep, vooroplopen, invloed en reputatie in het netwerk." },
+  { name: "Vitaliteit & energie", category: "gezondheid", description: "Fit voelen, meer energie, beter slapen en duurzaam presteren." },
+  { name: "Vermijden van pijn / angst", category: "gezondheid", description: "Chronische klachten, stress of burn-out beperken; controle over het lichaam." },
+  { name: "Levensduur & kwaliteit van leven", category: "gezondheid", description: "Gezond oud worden, onafhankelijk blijven, zorg voor jezelf en naasten." },
 ];
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
@@ -616,8 +712,9 @@ function ThemeToggle({ theme, setTheme, t }) {
 
 // ─── MAIN ───────────────────────────────────────────────────────────────────
 export default function ClientSystem() {
-  const [clients, setClients] = useState(CLIENTS);
-  const [activeId, setActiveId] = useState("auto");
+  const init = getInitialClientsAndActiveId();
+  const [clients, setClients] = useState(init.clients);
+  const [activeId, setActiveId] = useState(init.activeId);
   const [tab, setTab] = useState("roadmap");
   const [fwView, setFwView] = useState(null);
   const [activePhase, setActivePhase] = useState(null);
@@ -625,10 +722,32 @@ export default function ClientSystem() {
   const [channelView, setChannelView] = useState(false);
   const [copied, setCopied] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState(loadStoredTheme);
   const [aiBrief, setAiBrief] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
+  const importFileRef = useRef(null);
+  const importModeRef = useRef("replace");
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_CLIENTS_KEY, JSON.stringify(clients));
+    } catch (e) {
+      console.warn("Kon klanten niet opslaan in browser", e);
+    }
+  }, [clients]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_ACTIVE_ID_KEY, activeId);
+    } catch { /* ignore */ }
+  }, [activeId]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_THEME_KEY, theme);
+    } catch { /* ignore */ }
+  }, [theme]);
 
   const t = THEMES[theme];
   const client = clients.find(c => c.id === activeId) || clients[0];
@@ -644,6 +763,49 @@ export default function ClientSystem() {
     setClients(prev => [...prev, nc]);
     setActiveId(nc.id);
     setTab("profiel");
+  }
+
+  function exportClientsBackup() {
+    const blob = new Blob([JSON.stringify(clients, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `mt-marketing-klanten-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function onImportFileChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const mode = importModeRef.current;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result));
+        if (!Array.isArray(parsed) || !parsed.every(c => c && typeof c.id === "string")) {
+          window.alert("Ongeldig bestand: verwacht een JSON-array van klanten, elk met een id.");
+          e.target.value = "";
+          return;
+        }
+        if (mode === "replace") {
+          if (!window.confirm(`Alle huidige klanten (${clients.length}) vervangen door ${parsed.length} uit het bestand?`)) {
+            e.target.value = "";
+            return;
+          }
+          setClients(parsed);
+          setActiveId(parsed.some(c => c.id === activeId) ? activeId : parsed[0].id);
+        } else {
+          const merged = mergeClientsById(clients, parsed);
+          setClients(merged);
+          setActiveId(prev => (merged.some(c => c.id === prev) ? prev : merged[0]?.id || prev));
+          window.alert(`Samengevoegd: ${merged.length} klant(en) totaal.`);
+        }
+      } catch {
+        window.alert("Kon JSON niet lezen. Controleer of het een geldige export is.");
+      }
+      e.target.value = "";
+    };
+    reader.readAsText(file);
   }
 
   async function runAiOnboard() {
@@ -834,6 +996,54 @@ Schrijf in het Nederlands. Concreet, direct toepasbaar.`;
             })}
           </div>
         </nav>
+
+        {/* Data backup (localStorage + export/import) */}
+        <div style={{ padding: "8px 12px", borderTop: `1px solid ${t.border}` }}>
+          {!sidebarCollapsed && (
+            <SectionLabel t={t} style={{ margin: "0 0 8px", paddingLeft: 4 }}>Gegevens</SectionLabel>
+          )}
+          <input ref={importFileRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={onImportFileChange} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <button type="button" onClick={exportClientsBackup}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: sidebarCollapsed ? "center" : "flex-start", gap: 8,
+                width: "100%", background: t.surface2, border: `1px solid ${t.border}`,
+                borderRadius: t.radiusSm, padding: sidebarCollapsed ? "8px" : "8px 10px",
+                cursor: "pointer", color: t.textSecondary, fontSize: 12, fontFamily: t.fontBase,
+              }}
+              title="JSON-bestand downloaden als backup">
+              <Icon name="fileText" size={14} color={t.textMuted} />
+              {!sidebarCollapsed && <span>Export backup (.json)</span>}
+            </button>
+            <button type="button" onClick={() => { importModeRef.current = "replace"; importFileRef.current?.click(); }}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: sidebarCollapsed ? "center" : "flex-start", gap: 8,
+                width: "100%", background: t.surface2, border: `1px solid ${t.border}`,
+                borderRadius: t.radiusSm, padding: sidebarCollapsed ? "8px" : "8px 10px",
+                cursor: "pointer", color: t.textSecondary, fontSize: 12, fontFamily: t.fontBase,
+              }}
+              title="Vervangt alle klanten door het gekozen bestand">
+              <Icon name="layout" size={14} color={t.textMuted} />
+              {!sidebarCollapsed && <span>Import (vervangen)</span>}
+            </button>
+            <button type="button" onClick={() => { importModeRef.current = "merge"; importFileRef.current?.click(); }}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: sidebarCollapsed ? "center" : "flex-start", gap: 8,
+                width: "100%", background: t.surface2, border: `1px solid ${t.border}`,
+                borderRadius: t.radiusSm, padding: sidebarCollapsed ? "8px" : "8px 10px",
+                cursor: "pointer", color: t.textSecondary, fontSize: 12, fontFamily: t.fontBase,
+              }}
+              title="Voegt klanten toe / overschrijft opzelfde id">
+              <Icon name="layers" size={14} color={t.textMuted} />
+              {!sidebarCollapsed && <span>Import (samenvoegen)</span>}
+            </button>
+          </div>
+          {!sidebarCollapsed && (
+            <p style={{ color: t.textDim, fontSize: 10, margin: "8px 4px 0", lineHeight: 1.45 }}>
+              Automatisch opgeslagen in deze browser. Exporteer vóór je wist site-data of van computer wisselt.
+            </p>
+          )}
+        </div>
 
         {/* Theme toggle + Collapse */}
         <div style={{ padding: 12, borderTop: `1px solid ${t.border}`, display: "flex", flexDirection: "column", gap: 6 }}>
@@ -1131,6 +1341,65 @@ Schrijf in het Nederlands. Concreet, direct toepasbaar.`;
                   );
                 })}
               </Card>
+            </div>
+          )}
+
+          {/* ══ PRIMARY DRIVERS ══ */}
+          {tab === "drivers" && (
+            <div>
+              <SectionLabel t={t}>Primary Drivers</SectionLabel>
+              <Card t={t} style={{ marginBottom: 20, borderLeft: `4px solid ${t.accent}` }}>
+                <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: t.accentDim, border: `1px solid ${t.borderAccent}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Icon name="compass" size={22} color={t.accentLight} />
+                  </div>
+                  <div>
+                    <h2 style={{ color: t.text, fontSize: 18, fontWeight: 600, margin: "0 0 8px" }}>Wat zijn primary drivers?</h2>
+                    <p style={{ color: t.textSecondary, fontSize: 14, margin: "0 0 12px", lineHeight: 1.65 }}>
+                      <strong style={{ color: t.text }}>Primary drivers</strong> zijn de diepste motieven waarom iemand iets wil, koopt of verandert — vaak onuitgesproken. Ze zijn niet hetzelfde als een productfeature: ze verklaren <em>waarom</em> iets belangrijk is. In messaging en positionering koppel je aanbod aan deze drivers; elke driver valt onder één van drie hoofdcategorieën: <strong>financieel</strong>, <strong>relatie</strong> of <strong>gezondheid</strong> (vaak overlap, maar één categorie is meestal dominant).
+                    </p>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10 }}>
+                      {["financieel", "relatie", "gezondheid"].map((key) => {
+                        const cat = PRIMARY_DRIVER_CATEGORIES[key];
+                        const c = cat.color(t);
+                        const d = cat.dim(t);
+                        return (
+                          <div key={key} style={{ background: d, border: `1px solid ${c}33`, borderRadius: t.radiusSm, padding: "12px 14px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                              <Icon name={cat.icon} size={16} color={c} />
+                              <span style={{ color: c, fontSize: 13, fontWeight: 700 }}>{cat.label}</span>
+                            </div>
+                            <p style={{ color: t.textMuted, fontSize: 11, margin: "0 0 6px", fontWeight: 600 }}>{cat.short}</p>
+                            <p style={{ color: t.textSecondary, fontSize: 12, margin: 0, lineHeight: 1.5 }}>{cat.intro}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              <SectionLabel t={t}>Drivers &mdash; per hoofdcategorie</SectionLabel>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {PRIMARY_DRIVERS.map((d, i) => {
+                  const cat = PRIMARY_DRIVER_CATEGORIES[d.category];
+                  const c = cat.color(t);
+                  return (
+                    <Card key={i} t={t} style={{ padding: "16px 18px", borderLeft: `3px solid ${c}` }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
+                        <div style={{ flex: "1 1 240px" }}>
+                          <p style={{ color: t.text, fontSize: 15, fontWeight: 600, margin: "0 0 8px" }}>{d.name}</p>
+                          <p style={{ color: t.textSecondary, fontSize: 13, margin: 0, lineHeight: 1.55 }}>{d.description}</p>
+                        </div>
+                        <Badge t={t} color={c} bg={cat.dim(t)}>
+                          <Icon name={cat.icon} size={12} color={c} />
+                          {cat.label}
+                        </Badge>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
             </div>
           )}
 
