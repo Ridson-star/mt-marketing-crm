@@ -38,7 +38,9 @@ De **frontend-build** heeft geen Anthropic-key nodig. Alleen de **serverless API
 ## Data: browser vs cloud
 
 - **Alleen localStorage:** ingevoerde klanten worden standaard **per browser** opgeslagen (Chrome ≠ Firefox ≠ telefoon). Dezelfde URL kopieert **geen** data mee — dat is normaal.
-- **Cloud sync (optioneel):** koppel in Vercel **Storage → Redis / KV** (of bestaande KV) aan het project zodat `KV_REST_API_URL` en `KV_REST_API_TOKEN` in Environment Variables staan. Voeg **`SYNC_SECRET`** toe (een lang, willekeurig wachtwoord). Deploy opnieuw. In de app, onder **Gegevens → Cloud sync**, vul **exact hetzelfde** wachtwoord als `SYNC_SECRET` en klik **Opslaan token**. Daarna worden wijzigingen naar de server geschreven en laadt elke andere browser dezelfde data (na hetzelfde token).
+- **Cloud sync (optioneel)** — kies **één** backend (Supabase heeft voorrang in de code als beide gezet zijn):
+  - **Supabase (aanbevolen):** maak een project op [supabase.com](https://supabase.com), voer `supabase/schema.sql` uit in **SQL Editor**, ga naar **Settings → API** en zet in Vercel: **`SUPABASE_URL`**, **`SUPABASE_SERVICE_ROLE_KEY`** (service role, niet de anon key in de frontend). Voeg **`SYNC_SECRET`** toe (lang willekeurig wachtwoord). Deploy. In de app: **Gegevens → Cloud sync** → zelfde wachtwoord als `SYNC_SECRET` → **Opslaan token**.
+  - **Vercel KV / Redis:** koppel Storage in Vercel zodat **`KV_REST_API_URL`** en **`KV_REST_API_TOKEN`** bestaan, plus **`SYNC_SECRET`** — zelfde flow in de app.
 - Zonder cloud blijft **Export backup (.json)** handig om handmatig te verplaatsen.
 
 ## Aparte API-host (optioneel)

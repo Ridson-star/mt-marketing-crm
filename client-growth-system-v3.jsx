@@ -1147,7 +1147,7 @@ Schrijf in het Nederlands. Concreet, direct toepasbaar.`;
               <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${t.border}` }}>
                 <p style={{ color: t.textMuted, fontSize: 11, margin: "0 0 8px", lineHeight: 1.45, fontWeight: 600 }}>Cloud sync (andere browser / PC)</p>
                 <p style={{ color: t.textDim, fontSize: 10, margin: "0 0 8px", lineHeight: 1.45 }}>
-                  Lokaal = alleen deze browser. Voor dezelfde data overal: zet in Vercel <code style={{ fontSize: 10 }}>SYNC_SECRET</code> + koppel KV/Redis, vul hier exact hetzelfde wachtwoord en klik Opslaan.
+                  Lokaal = alleen deze browser. Cloud: Vercel <code style={{ fontSize: 10 }}>SYNC_SECRET</code> + <strong>Supabase</strong> (<code style={{ fontSize: 10 }}>SUPABASE_URL</code> + service role) of KV/Redis — zie README. Hier hetzelfde wachtwoord als <code style={{ fontSize: 10 }}>SYNC_SECRET</code>, dan Opslaan.
                 </p>
                 <input
                   type="password"

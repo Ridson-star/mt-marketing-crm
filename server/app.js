@@ -1,8 +1,8 @@
 import express from "express";
 import cors from "cors";
 import Anthropic from "@anthropic-ai/sdk";
-import { kv } from "@vercel/kv";
 import { ONBOARD_SYSTEM } from "./methodology.js";
+import { backendConfigured, readAppState, writeAppState } from "./appStateStorage.js";
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
@@ -100,17 +100,11 @@ const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: "2mb" }));
 
-const APP_STATE_KV_KEY = "mt-marketing-app-state";
-
-function kvConfigured() {
-  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
-}
-
 function requireSyncAuth(req, res, next) {
   const secret = process.env.SYNC_SECRET;
   if (!secret) {
     return res.status(503).json({
-      error: "SYNC_SECRET ontbreekt. Zet SYNC_SECRET in Vercel (Environment Variables) en koppel Vercel KV / Redis.",
+      error: "SYNC_SECRET ontbreekt. Zet SYNC_SECRET in Vercel + Supabase (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY) of Vercel KV.",
     });
   }
   const auth = req.headers.authorization || "";
@@ -127,18 +121,20 @@ apiRouter.get("/health", (_req, res) => {
   res.json({
     ok: true,
     model: MODEL,
-    cloudSync: Boolean(process.env.SYNC_SECRET && kvConfigured()),
+    cloudSync: Boolean(process.env.SYNC_SECRET && backendConfigured()),
+    storage: process.env.SUPABASE_URL ? "supabase" : process.env.KV_REST_API_URL ? "kv" : "none",
   });
 });
 
 apiRouter.get("/app-state", requireSyncAuth, async (_req, res) => {
-  if (!kvConfigured()) {
+  if (!backendConfigured()) {
     return res.status(503).json({
-      error: "Vercel KV / Redis niet gekoppeld (KV_REST_API_URL / KV_REST_API_TOKEN ontbreken).",
+      error:
+        "Geen cloud-storage: zet Supabase (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY, zie supabase/schema.sql) of Vercel KV (KV_REST_*).",
     });
   }
   try {
-    const data = await kv.get(APP_STATE_KV_KEY);
+    const data = await readAppState();
     if (data == null) {
       return res.json({ clients: null, activeId: null });
     }
@@ -150,8 +146,10 @@ apiRouter.get("/app-state", requireSyncAuth, async (_req, res) => {
 });
 
 apiRouter.put("/app-state", requireSyncAuth, async (req, res) => {
-  if (!kvConfigured()) {
-    return res.status(503).json({ error: "Vercel KV / Redis niet gekoppeld." });
+  if (!backendConfigured()) {
+    return res.status(503).json({
+      error: "Geen cloud-storage: Supabase of Vercel KV vereist.",
+    });
   }
   const body = req.body;
   if (!body || !Array.isArray(body.clients) || !body.clients.every((c) => c && typeof c.id === "string")) {
@@ -159,7 +157,7 @@ apiRouter.put("/app-state", requireSyncAuth, async (req, res) => {
   }
   const activeId = typeof body.activeId === "string" ? body.activeId : body.clients[0]?.id ?? "";
   try {
-    await kv.set(APP_STATE_KV_KEY, { clients: body.clients, activeId });
+    await writeAppState({ clients: body.clients, activeId });
     return res.json({ ok: true });
   } catch (e) {
     console.error(e);
