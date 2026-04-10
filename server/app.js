@@ -131,6 +131,7 @@ apiRouter.get("/health", (_req, res) => {
     SYNC_SECRET: s("SYNC_SECRET"),
     SUPABASE_URL: s("SUPABASE_URL"),
     NEXT_PUBLIC_SUPABASE_URL: s("NEXT_PUBLIC_SUPABASE_URL"),
+    SUPABASE_PROJECT_REF: s("SUPABASE_PROJECT_REF"),
     SUPABASE_SERVICE_ROLE_KEY: s("SUPABASE_SERVICE_ROLE_KEY"),
     KV_REST_API_URL: s("KV_REST_API_URL"),
     KV_REST_API_TOKEN: s("KV_REST_API_TOKEN"),
@@ -154,7 +155,7 @@ apiRouter.get("/health", (_req, res) => {
     },
     hint:
       !checks.SYNC_SECRET || !supabaseOk
-        ? "Vercel Production: SYNC_SECRET + project-URL (SUPABASE_URL of NEXT_PUBLIC_SUPABASE_URL) + SUPABASE_SERVICE_ROLE_KEY. Lege waarde = ongeldig. Redeploy na wijzigingen."
+        ? "Vercel Production: SYNC_SECRET + SUPABASE_SERVICE_ROLE_KEY + (SUPABASE_URL of SUPABASE_PROJECT_REF=je-project-id). Als URL-variabelen onzichtbaar blijven: zet SUPABASE_PROJECT_REF=axsqkzjxfjtbsypmieoy (jouw Project ID). Redeploy."
         : null,
   });
 });
